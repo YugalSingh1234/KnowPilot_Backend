@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,7 +15,7 @@ class Settings(BaseSettings):
     GEMINI_CHAT_MODEL: str = ""
     GEMINI_EMBED_MODEL: str = ""
     EMBED_DIM: int = 768
-    JWT_SECRET: str = ""
+    JWT_SECRET: str = Field(min_length=32)  # required; fail closed if missing or weak
     JWT_EXPIRE_MINUTES: int = 720
     FRONTEND_ORIGIN: str = "http://localhost:5173"
     PUBLIC_APP_URL: str = "http://localhost:5173"
