@@ -1,3 +1,72 @@
-from fastapi import APIRouter
+import secrets
+from typing import Annotated
 
-router = APIRouter()
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
+from app.db import get_db
+from app.errors import AppError
+from app.models import AssistantToken, Organization
+from app.security import create_access_token, get_current_org, hash_password, verify_password
+
+router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+
+class RegisterIn(BaseModel):
+    org_name: Annotated[str, Field(min_length=2, max_length=100)]
+    email: EmailStr
+    password: Annotated[str, Field(min_length=8)]
+
+    @field_validator("password")
+    @classmethod
+    def _bcrypt_limit(cls, v: str) -> str:
+        if len(v.encode()) > 72:
+            raise ValueError("password must be at most 72 bytes")
+        return v
+
+
+class LoginIn(BaseModel):
+    email: EmailStr
+    password: str
+
+
+def _org_out(org: Organization) -> dict:
+    return {"id": str(org.id), "name": org.name, "email": org.email}
+
+
+def _auth_out(org: Organization) -> dict:
+    return {"access_token": create_access_token(org.id), "org": _org_out(org)}
+
+
+@router.post("/register", status_code=201)
+def register(body: RegisterIn, db: Session = Depends(get_db)):
+    email = body.email.lower()
+    exists = AppError("email_exists", "This email is already registered.", 409)
+    if db.scalar(select(Organization.id).where(Organization.email == email)):
+        raise exists
+    org = Organization(name=body.org_name.strip(), email=email, password_hash=hash_password(body.password))
+    try:
+        db.add(org)
+        db.flush()  # org.id for the token row
+        db.add(AssistantToken(org_id=org.id, token=secrets.token_urlsafe(32), is_active=True))
+        db.commit()  # org + first token in one transaction
+    except IntegrityError:  # lost a race on the unique email
+        db.rollback()
+        raise exists
+    return _auth_out(org)
+
+
+@router.post("/login")
+def login(body: LoginIn, db: Session = Depends(get_db)):
+    org = db.scalar(select(Organization).where(Organization.email == body.email.lower()))
+    if org is None or not verify_password(body.password, org.password_hash):
+        raise AppError("invalid_credentials", "Invalid email or password.", 401)
+    return _auth_out(org)
+
+
+@router.get("/me")
+def me(org: Organization = Depends(get_current_org)):
+    return _org_out(org)

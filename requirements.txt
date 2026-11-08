@@ -16,3 +16,4 @@ scikit-learn==1.9.1
 SQLAlchemy==2.1.8
 supabase==2.34.1
 uvicorn[standard]==0.54.0
+email-validator==2.3.0
