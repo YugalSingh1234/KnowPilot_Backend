@@ -35,7 +35,8 @@ def regenerate(org: Organization = Depends(get_current_org), db: Session = Depen
 
 @router.get("/{token}/info")
 def public_info(token: str, request: Request, db: Session = Depends(get_db)):
-    ratelimit.check(token, request.client.host if request.client else "unknown")
+    ratelimit.check_ip(ratelimit.client_ip(request))
     org_id = tokens.resolve_assistant_token(token, db)
+    ratelimit.check_token(token)
     name = db.scalar(select(Organization.name).where(Organization.id == org_id))
     return {"org_name": name, "suggested_questions": []}

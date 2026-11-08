@@ -87,6 +87,32 @@ def test_rate_limit(org):
     assert r.json()["error"] == {"code": "rate_limited", "message": "Too many questions. Please wait a minute."}
 
 
+def test_rate_limit_per_ip_spoofed_header_ignored(org):
+    token = client.get("/api/assistant", headers=org["h"]).json()["token"]
+    for i in range(20):  # attacker rotates the forgeable leftmost entry; proxy-appended one is fixed
+        h = {"X-Forwarded-For": f"10.0.0.{i}, 203.0.113.7"}
+        assert client.get(f"/api/assistant/{token}/info", headers=h).status_code == 200
+    h = {"X-Forwarded-For": "10.0.0.99, 203.0.113.7"}
+    assert client.get(f"/api/assistant/{token}/info", headers=h).status_code == 429
+
+
+def test_unknown_tokens_get_no_counter_and_ip_block_spares_token(org, monkeypatch):
+    monkeypatch.setattr(ratelimit, "IP_LIMIT", 3)
+    for i in range(3):
+        client.get(f"/api/assistant/bogus-{i}/info")
+    assert not any(k.startswith("t:") for k in ratelimit._hits)
+    token = client.get("/api/assistant", headers=org["h"]).json()["token"]
+    assert client.get(f"/api/assistant/{token}/info").status_code == 429  # IP exhausted
+    assert f"t:{token}" not in ratelimit._hits  # blocked by IP -> token not charged
+
+
+def test_key_cap_evicts_oldest(monkeypatch):
+    monkeypatch.setattr(ratelimit, "MAX_KEYS", 3)
+    for i in range(5):
+        ratelimit.check_ip(f"198.51.100.{i}")
+    assert list(ratelimit._hits) == ["ip:198.51.100.2", "ip:198.51.100.3", "ip:198.51.100.4"]
+
+
 def test_cors_public_info_but_not_regenerate():
     h = {"Origin": "http://school.example", "Access-Control-Request-Method": "GET"}
     assert client.options("/api/assistant/abc/info", headers=h).headers.get("access-control-allow-origin") == "*"
