@@ -30,6 +30,8 @@ create table if not exists documents (
     created_at   timestamptz not null default now()
 );
 create index if not exists ix_documents_org_id on documents(org_id);
+alter table documents add column if not exists error_message text;
+create unique index if not exists ux_documents_org_filename on documents(org_id, filename);
 
 create table if not exists chunks (
     id          uuid primary key default gen_random_uuid(),
