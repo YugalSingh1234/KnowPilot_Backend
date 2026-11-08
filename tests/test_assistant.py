@@ -1,4 +1,5 @@
 import uuid
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -100,17 +101,40 @@ def test_unknown_tokens_get_no_counter_and_ip_block_spares_token(org, monkeypatc
     monkeypatch.setattr(ratelimit, "IP_LIMIT", 3)
     for i in range(3):
         client.get(f"/api/assistant/bogus-{i}/info")
-    assert not any(k.startswith("t:") for k in ratelimit._hits)
+    assert not ratelimit._token_hits
     token = client.get("/api/assistant", headers=org["h"]).json()["token"]
     assert client.get(f"/api/assistant/{token}/info").status_code == 429  # IP exhausted
-    assert f"t:{token}" not in ratelimit._hits  # blocked by IP -> token not charged
+    assert token not in ratelimit._token_hits  # blocked by IP -> token not charged
 
 
-def test_key_cap_evicts_oldest(monkeypatch):
+def test_token_limit_is_higher_than_ip_limit():
+    assert (ratelimit.IP_LIMIT, ratelimit.TOKEN_LIMIT) == (20, 200)
+    for _ in range(200):
+        ratelimit.check_token("tok")
+    with pytest.raises(Exception):
+        ratelimit.check_token("tok")
+
+
+def test_full_store_fails_closed_and_keeps_live_counters(monkeypatch):
+    clock = [1000.0]
+    monkeypatch.setattr(ratelimit.time, "monotonic", lambda: clock[0])
     monkeypatch.setattr(ratelimit, "MAX_KEYS", 3)
-    for i in range(5):
+    for i in range(3):
         ratelimit.check_ip(f"198.51.100.{i}")
-    assert list(ratelimit._hits) == ["ip:198.51.100.2", "ip:198.51.100.3", "ip:198.51.100.4"]
+    with pytest.raises(Exception):  # store full of live counters: new key refused
+        ratelimit.check_ip("198.51.100.9")
+    assert list(ratelimit._ip_hits) == [f"198.51.100.{i}" for i in range(3)]  # nothing evicted
+    clock[0] += 61  # windows expire -> expired entries make room
+    ratelimit.check_ip("198.51.100.9")
+    assert list(ratelimit._ip_hits) == ["198.51.100.9"]
+
+
+def test_ipv6_grouped_by_64():
+    def ip_for(header):
+        return ratelimit.client_ip(SimpleNamespace(headers={"x-forwarded-for": header}, client=None))
+
+    assert ip_for("2001:db8:1:2::1") == ip_for("2001:db8:1:2:ffff::9") == "2001:db8:1:2::/64"
+    assert ip_for("garbage") == "unknown"
 
 
 def test_cors_public_info_but_not_regenerate():

@@ -106,7 +106,7 @@ Errors:
 - 429 `rate_limited`: "Too many questions. Please wait a minute."
 
 Public routes (`/api/assistant/{token}/info`, `/api/ask`) are limited to 20 requests per minute
-per token and per IP.
+per visitor IP and 200 requests per minute per assistant token (all visitors combined).
 
 ## Ask
 to be filled
