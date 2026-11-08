@@ -105,6 +105,31 @@ def test_too_large(org, monkeypatch):
     assert code == "file_too_large" and message.endswith("the limit is 10 MB.")
 
 
+def test_too_much_text(org, monkeypatch):
+    monkeypatch.setattr(ingest, "MAX_TEXT_CHARS", 500)
+    assert err(upload(org, make_pdf([PARA * 8])))[0] == "text_limit"
+
+
+def test_limit_rechecked_under_lock(org, monkeypatch):
+    """Simulates a concurrent upload landing between validation and insert."""
+    real_validate = ingest.validate_pdf
+
+    def validate_then_race(db, org_id, filename, data):
+        pages = real_validate(db, org_id, filename, data)
+        with SessionLocal() as other:
+            other.add_all(
+                Document(org_id=org_id, filename=f"r{i}.pdf", storage_path="x", page_count=1, size_bytes=1)
+                for i in range(10)
+            )
+            other.commit()
+        return pages
+
+    monkeypatch.setattr(ingest, "validate_pdf", validate_then_race)
+    assert err(upload(org, make_pdf([PARA])))[0] == "document_limit"
+    with SessionLocal() as db:
+        assert db.scalar(select(func.count()).select_from(Document).where(Document.org_id == org["id"])) == 10
+
+
 def test_duplicate_filename(org):
     assert upload(org, make_pdf([PARA])).status_code == 201
     assert err(upload(org, make_pdf([PARA])))[0] == "duplicate_filename"

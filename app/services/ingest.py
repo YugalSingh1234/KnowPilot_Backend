@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.errors import AppError
 from app.llm.embeddings import embed_documents
-from app.models import Chunk, Document
+from app.models import Chunk, Document, Organization
 from app.services import storage
 
 log = logging.getLogger("knowpilot.ingest")
@@ -20,6 +20,7 @@ MAX_PAGES = 20
 MAX_MB = 10
 MAX_BYTES = MAX_MB * 1024 * 1024
 MIN_TEXT_CHARS = 50
+MAX_TEXT_CHARS = 300_000  # ~15k chars/page; caps chunk count and embedding cost
 CHUNK_SIZE = 900
 CHUNK_OVERLAP = 150
 MIN_CHUNK_CHARS = 40
@@ -75,12 +76,7 @@ def check_file(filename: str, head: bytes, size: int) -> None:
 def validate_pdf(db: Session, org_id, filename: str, data: bytes) -> list[str]:
     """Run checks 1-7 in order; return the text of each page."""
     check_file(filename, data[:5], len(data))
-    used = db.scalar(select(func.count()).select_from(Document).where(Document.org_id == org_id))
-    if used >= MAX_DOCUMENTS:
-        raise AppError(
-            "document_limit",
-            f"You already have {used} of {MAX_DOCUMENTS} documents. Delete one first.", 409,
-        )
+    _check_document_limit(db, org_id)
     try:
         pdf = pymupdf.open(stream=data, filetype="pdf")
     except Exception:
@@ -90,12 +86,29 @@ def validate_pdf(db: Session, org_id, filename: str, data: bytes) -> list[str]:
             raise AppError("encrypted_pdf", "This PDF is password-protected. Please upload an unlocked copy.", 400)
         if pdf.page_count > MAX_PAGES:
             raise AppError("page_limit", f"This PDF has {pdf.page_count} pages; the limit is {MAX_PAGES}.", 400)
-        pages = [page.get_text() for page in pdf]
+        pages, total = [], 0
+        for page in pdf:  # stop extracting as soon as the cap is exceeded
+            pages.append(page.get_text())
+            total += len(pages[-1])
+            if total > MAX_TEXT_CHARS:
+                raise AppError(
+                    "text_limit",
+                    f"This PDF contains too much text; the limit is {MAX_TEXT_CHARS:,} characters.", 400,
+                )
     if sum(len("".join(p.split())) for p in pages) < MIN_TEXT_CHARS:
         raise AppError("no_text", "This looks like a scanned image. Please upload a text-based PDF.", 400)
     if db.scalar(select(Document.id).where(Document.org_id == org_id, Document.filename == filename)):
         raise AppError("duplicate_filename", f'A document named "{filename}" already exists.', 409)
     return pages
+
+
+def _check_document_limit(db: Session, org_id) -> None:
+    used = db.scalar(select(func.count()).select_from(Document).where(Document.org_id == org_id))
+    if used >= MAX_DOCUMENTS:
+        raise AppError(
+            "document_limit",
+            f"You already have {used} of {MAX_DOCUMENTS} documents. Delete one first.", 409,
+        )
 
 
 # ---------- ingestion ----------
@@ -108,8 +121,14 @@ def ingest(db: Session, org_id, filename: str, data: bytes) -> Document:
     )
     doc.storage_path = storage_path(org_id, doc.id)
     try:
+        # Serialize uploads per org: lock the org row, re-count, insert, commit (one transaction).
+        db.execute(select(Organization.id).where(Organization.id == org_id).with_for_update())
+        _check_document_limit(db, org_id)
         db.add(doc)
         db.commit()
+    except AppError:
+        db.rollback()
+        raise
     except IntegrityError:  # concurrent upload with the same name
         db.rollback()
         raise AppError("duplicate_filename", f'A document named "{filename}" already exists.', 409)

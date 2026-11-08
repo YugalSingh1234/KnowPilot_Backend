@@ -52,6 +52,7 @@ Errors, checked in this order:
 | 409 | `document_limit` | You already have 10 of 10 documents. Delete one first. |
 | 400 | `encrypted_pdf` | This PDF is password-protected. Please upload an unlocked copy. |
 | 400 | `page_limit` | This PDF has 27 pages; the limit is 20. |
+| 400 | `text_limit` | This PDF contains too much text; the limit is 300,000 characters. |
 | 400 | `no_text` | This looks like a scanned image. Please upload a text-based PDF. |
 | 409 | `duplicate_filename` | A document named "Scholarship_Policy.pdf" already exists. |
 | 500 | `document_processing_failed` | We couldn't process this PDF. Please try again. |
