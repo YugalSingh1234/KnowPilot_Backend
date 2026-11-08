@@ -77,7 +77,36 @@ Removes the document, its chunks and its stored file.
 Errors: 404 `not_found` if the id doesn't exist **or** belongs to another organization.
 
 ## Assistant
-to be filled
+
+### GET /api/assistant  → 200  (admin, Bearer access_token)
+```json
+{
+  "assistant_url": "http://localhost:5173/a/Xy3...token",
+  "token": "Xy3...token",
+  "created_at": "2026-11-08T09:03:28.504000+00:00",
+  "embed_code": "<iframe src=\"http://localhost:5173/a/Xy3...token\" width=\"100%\" height=\"600\" style=\"border:0;border-radius:12px\" title=\"Sunrise College Assistant\" loading=\"lazy\"></iframe>"
+}
+```
+`assistant_url` is `{PUBLIC_APP_URL}/a/{token}`, so the frontend must serve the route `/a/:token`.
+The org name in `title` is HTML-escaped.
+
+### POST /api/assistant/regenerate  → 200  (admin, Bearer access_token)
+No body. Revokes the current token and issues a new one; the old link stops working
+immediately (its `/info` and `/api/ask` calls return 404 `invalid_token`). Response: same shape
+as GET /api/assistant.
+
+### GET /api/assistant/{token}/info  → 200  (public, no login, any origin)
+```json
+{"org_name": "Sunrise College", "suggested_questions": []}
+```
+Never returns emails or ids. `suggested_questions` is empty for now.
+
+Errors:
+- 404 `invalid_token`: "This assistant link is not active." (unknown, revoked or malformed token)
+- 429 `rate_limited`: "Too many questions. Please wait a minute."
+
+Public routes (`/api/assistant/{token}/info`, `/api/ask`) are limited to 20 requests per minute
+per token and per IP.
 
 ## Ask
 to be filled

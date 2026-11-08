@@ -1,3 +1,5 @@
+import re
+
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -9,7 +11,8 @@ from app.db import get_db
 from app.errors import register_error_handlers
 from app.routers import ask, assistant, auth, documents, usage
 
-PUBLIC_PREFIXES = ("/api/ask", "/api/assistant/")
+# Public (any origin): /api/ask and /api/assistant/{token}/info. Admin routes stay on FRONTEND_ORIGIN.
+PUBLIC_PATH = re.compile(r"^/api/ask(/.*)?$|^/api/assistant/[^/]+/info$")
 
 
 class SplitCORS:
@@ -23,7 +26,7 @@ class SplitCORS:
         )
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
-        if scope["type"] == "http" and scope["path"].startswith(PUBLIC_PREFIXES):
+        if scope["type"] == "http" and PUBLIC_PATH.match(scope["path"]):
             return await self.public(scope, receive, send)
         return await self.private(scope, receive, send)
 

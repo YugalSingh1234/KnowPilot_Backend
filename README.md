@@ -17,3 +17,7 @@ pytest
 ```
 
 Health check: http://localhost:8000/api/health
+
+Behind a proxy (Render), start with
+`uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"`
+so the per-IP rate limit sees the visitor's IP instead of the proxy's.

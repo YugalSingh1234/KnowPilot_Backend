@@ -42,6 +42,7 @@ class AssistantToken(Base):
     org_id: Mapped[uuid.UUID] = _org_fk()
     token: Mapped[str] = mapped_column(Text, unique=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = _created()
 
 

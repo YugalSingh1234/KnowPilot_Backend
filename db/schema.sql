@@ -18,6 +18,9 @@ create table if not exists assistant_tokens (
     created_at timestamptz not null default now()
 );
 create index if not exists ix_assistant_tokens_org_id on assistant_tokens(org_id);
+alter table assistant_tokens add column if not exists revoked_at timestamptz;
+-- at most one active token per organization
+create unique index if not exists ux_assistant_tokens_one_active on assistant_tokens(org_id) where is_active;
 
 create table if not exists documents (
     id           uuid primary key default gen_random_uuid(),
