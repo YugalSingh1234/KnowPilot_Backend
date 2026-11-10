@@ -44,6 +44,7 @@ class LLMSpec(BaseModel):
 
 
 class LLMAnswer(BaseModel):
+    covered: bool
     answer_text: str
     used_sources: list[LLMSource]
 
@@ -136,4 +137,4 @@ def generate_answer(question: str, chunks: list[dict], language: str, question_t
         if (s.filename, s.page) in known and (s.filename, s.page) not in seen:
             seen.add((s.filename, s.page))
             used.append({"filename": s.filename, "page": s.page})
-    return {"answer_text": out.answer_text.strip(), "used_sources": used}
+    return {"covered": bool(out.covered), "answer_text": out.answer_text.strip(), "used_sources": used}

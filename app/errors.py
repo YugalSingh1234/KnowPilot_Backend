@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import InterfaceError, OperationalError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 log = logging.getLogger("knowpilot")
@@ -31,6 +32,12 @@ def register_error_handlers(app: FastAPI) -> None:
         first = e.errors()[0] if e.errors() else {}
         loc = ".".join(str(p) for p in first.get("loc", []))
         return _body("validation_error", f"{loc}: {first.get('msg', 'invalid request')}", 422)
+
+    @app.exception_handler(OperationalError)
+    @app.exception_handler(InterfaceError)
+    async def _db_down(_: Request, e: Exception):
+        log.error("Database unavailable: %s", type(e).__name__)
+        return _body("service_busy", "Please try again in a moment.", 503)
 
     @app.exception_handler(Exception)
     async def _unhandled(_: Request, e: Exception):

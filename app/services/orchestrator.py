@@ -4,6 +4,7 @@ import time
 
 from sqlalchemy.orm import Session
 
+from app.db import db_retry
 from app.errors import AppError
 from app.llm import generate
 from app.models import QuestionLog
@@ -56,7 +57,7 @@ def ask(db: Session, org_id, question: str) -> dict:
     qtype = classifier.classify(question)["label"]
     trace.add("classifier", "system1")
 
-    chunks = retrieval.retrieve(db, org_id, question)
+    chunks = db_retry(db, lambda: retrieval.retrieve(db, org_id, question))
     trace.add("retrieval", "retrieval")
     gate = answerability.is_answerable(chunks)
     trace.add("answerability_gate", "system1")
@@ -79,8 +80,11 @@ def ask(db: Session, org_id, question: str) -> dict:
         try:
             out = generate.generate_answer(question, chunks, language, qtype, decision)
             trace.add("generate_answer", "llm")
-            status, answer = "answered", out["answer_text"]
-            references = [_reference(chunks, s["filename"], s["page"]) for s in out["used_sources"]]
+            if out["covered"]:
+                status, answer = "answered", out["answer_text"]
+                references = [_reference(chunks, s["filename"], s["page"]) for s in out["used_sources"]]
+            else:
+                status, answer = "no_answer", NO_ANSWER[language]
         except AppError:
             trace.add("generate_answer_failed", "fallback")
             pages = list(dict.fromkeys((c["filename"], c["page_number"]) for c in chunks))[:3]
@@ -90,11 +94,11 @@ def ask(db: Session, org_id, question: str) -> dict:
                 f"{r['filename']} — Page {r['page']}: {r['snippet']}" for r in references)
 
     decision_out = _decision_out(decision) if decision else None
-    db.add(QuestionLog(  # no question text, no personal facts
+    row = QuestionLog(  # no question text, no personal facts
         org_id=org_id, language=language, question_type=qtype, status=status,
         decision=decision_out["outcome"] if decision_out else None,
         latency_ms=int((time.perf_counter() - started) * 1000),
-    ))
-    db.commit()
+    )
+    db_retry(db, lambda: (db.add(row), db.commit()))
     return {"status": status, "answer": answer, "language": language, "question_type": qtype,
             "references": references, "decision": decision_out, "trace": trace.steps}

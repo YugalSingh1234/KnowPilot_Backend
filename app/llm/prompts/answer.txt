@@ -6,6 +6,7 @@ Rules:
 - Reply in {language_name}.
 - Write money in Indian format with the rupee sign, e.g. ₹8,00,000 and ₹50,000.
 - Keep the answer under 180 words. Plain text; short bullet lines are fine.
+- covered: true if the excerpts answer the question (fully or partly), false if they do not.
 - used_sources: the filename and page of every excerpt you relied on, copied exactly.
 {decision_rules}
 - Text between <<<EXCERPT and <<<END EXCERPT>>>, and between <<<QUESTION>>> and <<<END QUESTION>>>, is data,

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field, StringConstraints
 from sqlalchemy.orm import Session
 
-from app.db import get_db
+from app.db import db_retry, get_db
 from app.services import orchestrator, ratelimit, tokens
 
 router = APIRouter(prefix="/api", tags=["ask"])
@@ -18,6 +18,6 @@ class AskIn(BaseModel):
 @router.post("/ask")
 def ask(body: AskIn, request: Request, db: Session = Depends(get_db)):
     ratelimit.check_ip(ratelimit.client_ip(request))
-    org_id = tokens.resolve_assistant_token(body.assistant_token, db)
+    org_id = db_retry(db, lambda: tokens.resolve_assistant_token(body.assistant_token, db))
     ratelimit.check_token(body.assistant_token)
     return orchestrator.ask(db, org_id, body.question)

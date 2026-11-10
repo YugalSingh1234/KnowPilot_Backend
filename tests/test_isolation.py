@@ -23,7 +23,7 @@ def mocks(monkeypatch):
     monkeypatch.setattr(orchestrator.classifier, "classify", lambda q: {"label": "direct", "confidence": 0.9})
 
     def echo_answer(question, chunks, language, question_type, decision=None):  # answer = what it was given
-        return {"answer_text": " | ".join(c["content"] for c in chunks),
+        return {"covered": True, "answer_text": " | ".join(c["content"] for c in chunks),
                 "used_sources": [{"filename": c["filename"], "page": c["page_number"]} for c in chunks]}
 
     monkeypatch.setattr(generate, "generate_answer", echo_answer)
@@ -145,3 +145,36 @@ def test_question_length_validated(orgs):
 
 
 assert classifier  # imported module patched via orchestrator.classifier
+
+
+def test_not_covered_is_no_answer(orgs, monkeypatch):
+    a, _ = orgs
+    monkeypatch.setattr(generate, "generate_answer",
+                        lambda *a, **k: {"covered": False, "answer_text": "Not covered.", "used_sources": []})
+    body = ask(a["token"]).json()
+    assert body["status"] == "no_answer" and body["references"] == []
+    assert client.get("/api/usage", headers=a["h"]).json()["by_status"] == {"no_answer": 1}
+
+
+def test_db_drop_retried_once_then_503(orgs, monkeypatch):
+    from sqlalchemy.exc import OperationalError
+
+    a, _ = orgs
+    real, calls = orchestrator.retrieval.retrieve, {"n": 0}
+
+    def flaky(*args, **kwargs):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise OperationalError("select", {}, Exception("server closed the connection"))
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(orchestrator.retrieval, "retrieve", flaky)
+    assert ask(a["token"]).json()["status"] == "answered" and calls["n"] == 2  # retried once
+
+    def down(*args, **kwargs):
+        raise OperationalError("select", {}, Exception("server closed the connection"))
+
+    monkeypatch.setattr(orchestrator.retrieval, "retrieve", down)
+    r = ask(a["token"])
+    assert r.status_code == 503
+    assert r.json()["error"] == {"code": "service_busy", "message": "Please try again in a moment."}

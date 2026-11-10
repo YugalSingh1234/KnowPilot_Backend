@@ -140,7 +140,7 @@ Response:
 
 | Field | Values |
 |---|---|
-| `status` | `answered`; `no_answer` (out of scope, or the documents don't cover it; fixed message, no LLM call, `references` is `[]`); `passages_only` (AI service busy: `answer` starts with "The AI service is busy; here are the most relevant passages:" and `references` holds the top 3 passages) |
+| `status` | `answered`; `no_answer` (fixed message, `references` is `[]`: out of scope or low retrieval scores, with no LLM call; or the LLM reports the documents don't cover it); `passages_only` (AI service busy: `answer` starts with "The AI service is busy; here are the most relevant passages:" and `references` holds the top 3 passages) |
 | `language` | `en`, `hi`, `hinglish` |
 | `question_type` | `direct`, `policy`, `procedural`, `eligibility`, `comparison`, `out_of_scope` |
 | `decision` | `null` unless the question is an eligibility question and rules were found |
@@ -151,7 +151,7 @@ Response:
 
 The decision is computed in Python; the answer text never contradicts it.
 
-Errors: 404 `invalid_token`, 422 `validation_error`, 429 `rate_limited`.
+Errors: 404 `invalid_token`, 422 `validation_error`, 429 `rate_limited`, 503 `service_busy` ("Please try again in a moment.", database briefly unreachable after one retry; any route can return it).
 
 ## Usage
 
