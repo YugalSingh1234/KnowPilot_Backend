@@ -76,16 +76,16 @@ def test_language(text, expected):
     assert language.detect(text) == expected
 
 
-# ---------- answerability gate (GATE_MIN_SIMILARITY = 0.55 from settings) ----------
+# ---------- answerability gate (0.60, keyword-assisted 0.55) ----------
 def _chunks(vector, keyword=0.0):
     return [{"vector_score": vector, "keyword_score": keyword}]
 
 
 def test_gate():
     assert is_answerable(_chunks(0.70))["answerable"] is True
-    assert is_answerable(_chunks(0.50, keyword=0.3))["answerable"] is True   # keyword-assisted
-    assert is_answerable(_chunks(0.50, keyword=0.0))["answerable"] is False
-    assert is_answerable(_chunks(0.40, keyword=1.0))["answerable"] is False
+    assert is_answerable(_chunks(0.57, keyword=0.3))["answerable"] is True  # keyword-assisted
+    assert is_answerable(_chunks(0.57, keyword=0.0))["answerable"] is False
+    assert is_answerable(_chunks(0.50, keyword=1.0))["answerable"] is False
     assert is_answerable([]) == {"answerable": False, "confidence": 0.0}
 
 

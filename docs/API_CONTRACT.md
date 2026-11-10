@@ -109,7 +109,60 @@ Public routes (`/api/assistant/{token}/info`, `/api/ask`) are limited to 20 requ
 per visitor IP and 200 requests per minute per assistant token (all visitors combined).
 
 ## Ask
-to be filled
+
+### POST /api/ask  → 200  (public, no login, any origin)
+Request: `{"assistant_token": "Xy3...token", "question": "Am I eligible for merit-cum-means?"}`
+- `question` is trimmed and must be 3-1000 characters.
+
+Response:
+```json
+{
+  "status": "answered",
+  "answer": "No, you are not eligible ... (plain text, under ~180 words, in the user's language)",
+  "language": "en",
+  "question_type": "eligibility",
+  "references": [
+    {"filename": "NIT_Scholarship_Policy_2025-26.pdf", "page": 1, "snippet": "1. Merit-cum-Means Scholarship ..."}
+  ],
+  "decision": {
+    "outcome": "NOT_ELIGIBLE",
+    "score": 80,
+    "booleans": [
+      {"label": "Annual family income", "result": "TRUE", "user_value": 650000,
+       "required_value": "₹8,00,000", "source": {"filename": "NIT_Scholarship_Policy_2025-26.pdf", "page": 1}}
+    ],
+    "missing_facts": [],
+    "timings": [{"decision": "boolean", "start_ms": 0.4, "end_ms": 1.2, "error": null}]
+  },
+  "trace": [{"step": "language", "kind": "system1", "ms": 0.1}, {"step": "generate_answer", "kind": "llm", "ms": 2140.5}]
+}
+```
+
+| Field | Values |
+|---|---|
+| `status` | `answered`; `no_answer` (out of scope, or the documents don't cover it; fixed message, no LLM call, `references` is `[]`); `passages_only` (AI service busy: `answer` starts with "The AI service is busy; here are the most relevant passages:" and `references` holds the top 3 passages) |
+| `language` | `en`, `hi`, `hinglish` |
+| `question_type` | `direct`, `policy`, `procedural`, `eligibility`, `comparison`, `out_of_scope` |
+| `decision` | `null` unless the question is an eligibility question and rules were found |
+| `decision.outcome` | `ELIGIBLE`, `NOT_ELIGIBLE`, `NEEDS_MORE_INFO` (then `missing_facts` lists what to ask) |
+| `booleans[].result` | `TRUE`, `FALSE`, `UNKNOWN` |
+| `decision.score` | 0-100: weighted share of conditions met (UNKNOWN counts half) |
+| `trace[].kind` | `system1`, `retrieval`, `llm`, `fallback` |
+
+The decision is computed in Python; the answer text never contradicts it.
+
+Errors: 404 `invalid_token`, 422 `validation_error`, 429 `rate_limited`.
 
 ## Usage
-to be filled
+
+### GET /api/usage  → 200  (admin, Bearer access_token)
+Counts for the caller's organization only. Question text and personal facts are never stored.
+```json
+{
+  "total_questions": 42,
+  "by_status": {"answered": 35, "no_answer": 6, "passages_only": 1},
+  "by_question_type": {"eligibility": 12, "direct": 20, "policy": 10},
+  "by_language": {"en": 30, "hinglish": 10, "hi": 2}
+}
+```
+Keys appear only when their count is above zero.

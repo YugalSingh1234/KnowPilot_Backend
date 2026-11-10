@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     JWT_EXPIRE_MINUTES: int = 720
     FRONTEND_ORIGIN: str = "http://localhost:5173"
     PUBLIC_APP_URL: str = "http://localhost:5173"
-    GATE_MIN_SIMILARITY: float = 0.55
+    GATE_MIN_SIMILARITY: float = 0.60
+    GATE_KEYWORD_MIN_SIMILARITY: float = 0.55
 
 
 @lru_cache

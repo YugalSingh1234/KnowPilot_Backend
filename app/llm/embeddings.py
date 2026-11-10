@@ -1,6 +1,7 @@
 import logging
 import time
 
+import httpcore
 import httpx
 import numpy as np
 from google.genai import errors, types
@@ -25,7 +26,8 @@ def llm_unavailable() -> AppError:
 def _retryable(e: Exception) -> bool:
     if isinstance(e, errors.APIError):
         return e.code == 429 or (e.code or 0) >= 500
-    return isinstance(e, httpx.TransportError)  # timeouts, connection resets
+    # timeouts, connection resets (google-genai can surface raw httpcore errors too)
+    return isinstance(e, (httpx.TransportError, httpcore.TimeoutException, httpcore.NetworkError))
 
 
 def call_with_retry(fn):
