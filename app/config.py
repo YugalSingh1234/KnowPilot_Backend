@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     GATE_MIN_SIMILARITY: float = 0.60
     GATE_KEYWORD_MIN_SIMILARITY: float = 0.55
 
+    @property
+    def frontend_origins(self) -> list[str]:
+        """FRONTEND_ORIGIN may be a comma-separated list, e.g. "https://app.vercel.app,http://localhost:5173"."""
+        return [o.strip().rstrip("/") for o in self.FRONTEND_ORIGIN.split(",") if o.strip()]
+
 
 @lru_cache
 def get_settings() -> Settings:

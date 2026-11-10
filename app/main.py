@@ -22,7 +22,7 @@ class SplitCORS:
         kw = dict(allow_methods=["*"], allow_headers=["*"])
         self.public = CORSMiddleware(app, allow_origins=["*"], **kw)
         self.private = CORSMiddleware(
-            app, allow_origins=[get_settings().FRONTEND_ORIGIN], allow_credentials=True, **kw
+            app, allow_origins=get_settings().frontend_origins, allow_credentials=True, **kw
         )
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
