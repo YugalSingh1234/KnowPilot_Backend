@@ -43,6 +43,15 @@ def test_register_validation():
     assert r.status_code == 422 and "error" in r.json()
 
 
+def test_test_tld_email_accepted():
+    email = f"demo-{uuid.uuid4().hex[:8]}@navodaya.test"
+    r = client.post("/api/auth/register", json={"org_name": "Demo", "email": email, "password": PASSWORD})
+    assert r.status_code == 201, r.text
+    with SessionLocal() as db:
+        db.execute(delete(Organization).where(Organization.id == uuid.UUID(r.json()["org"]["id"])))
+        db.commit()
+
+
 def test_login_ok(org):
     r = client.post("/api/auth/login", json={"email": org["email"], "password": PASSWORD})
     assert r.status_code == 200 and r.json()["org"]["id"] == org["org"]["id"]

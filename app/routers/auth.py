@@ -1,4 +1,6 @@
 import secrets
+
+import email_validator
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -13,6 +15,10 @@ from app.models import AssistantToken, Organization
 from app.security import create_access_token, get_current_org, hash_password, verify_password
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+# Allow the reserved ".test" TLD so demo accounts (admin@navodaya.test) can't collide with real domains.
+if "test" in email_validator.SPECIAL_USE_DOMAIN_NAMES:
+    email_validator.SPECIAL_USE_DOMAIN_NAMES.remove("test")
 
 
 class RegisterIn(BaseModel):
