@@ -182,6 +182,28 @@ def test_requires_login():
     assert client.get("/api/documents").status_code == 401
 
 
+def _pdf_with_chrome(bodies: list[str]) -> pymupdf.Document:
+    """Each page: a running header and footer in the margins, a unique body line and a repeated body line."""
+    doc = pymupdf.open()
+    for i, body in enumerate(bodies, 1):
+        page = doc.new_page()  # 842pt tall: the 7% margins are the top/bottom ~59pt
+        page.insert_text((50, 30), "Acme College | Fee Rules", fontsize=9)
+        page.insert_text((50, 300), body, fontsize=11)
+        page.insert_text((50, 400), "Repeated rule on every page.", fontsize=11)
+        page.insert_text((50, 825), f"Illustrative footer   Page {i}", fontsize=8)
+    return doc
+
+
+def test_running_headers_and_footers_stripped():
+    bodies = ["Hostel fee is due in July.", "Refunds follow the schedule.", "Late fee is charged weekly."]
+    pages = ingest.extract_pages(_pdf_with_chrome(bodies))
+    for page, body in zip(pages, bodies):
+        assert body in page and "Repeated rule on every page." in page  # body kept, even when repeated
+        assert "Acme College" not in page and "Illustrative footer" not in page
+    single = ingest.extract_pages(_pdf_with_chrome(["Only page."]))[0]
+    assert "Acme College" in single  # nothing "repeats" in a one-page PDF
+
+
 def test_chunk_page_sizes_and_overlap():
     chunks = ingest.chunk_page((PARA * 30) + "\n\nShort.")
     assert len(chunks) > 1

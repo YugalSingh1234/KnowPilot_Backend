@@ -63,6 +63,28 @@ def chunk_page(text: str) -> list[str]:
     return [c for c in chunks if len(c) >= MIN_CHUNK_CHARS]
 
 
+MARGIN = 0.07  # top/bottom 7% of the page height is where running headers and footers sit
+
+
+def extract_pages(pdf) -> list[str]:
+    """Page texts without running headers/footers: text blocks lying in the top or bottom MARGIN that
+    repeat (digits ignored) on at least 60% of pages. Body text is never touched, even if it repeats.
+    ponytail: geometric heuristic; a header placed lower than 7% of the page height survives."""
+    key = lambda t: re.sub(r"\d+", "#", " ".join(t.split()).lower())  # noqa: E731
+    pages = []
+    for page in pdf:
+        top, bottom = page.rect.height * MARGIN, page.rect.height * (1 - MARGIN)
+        pages.append([(b[4], b[3] <= top or b[1] >= bottom)
+                      for b in page.get_text("blocks", sort=True) if b[6] == 0 and b[4].strip()])
+    seen: dict[str, int] = {}
+    for blocks in pages:
+        for k in {key(t) for t, in_margin in blocks if in_margin}:
+            seen[k] = seen.get(k, 0) + 1
+    threshold = max(2, -(-len(pages) * 6 // 10))  # ceil(60%), and never for a 1-page PDF
+    repeated = {k for k, n in seen.items() if n >= threshold}
+    return ["\n".join(t for t, in_margin in blocks if not (in_margin and key(t) in repeated)) for blocks in pages]
+
+
 # ---------- validation ----------
 
 def check_file(filename: str, head: bytes, size: int) -> None:
@@ -86,15 +108,15 @@ def validate_pdf(db: Session, org_id, filename: str, data: bytes) -> list[str]:
             raise AppError("encrypted_pdf", "This PDF is password-protected. Please upload an unlocked copy.", 400)
         if pdf.page_count > MAX_PAGES:
             raise AppError("page_limit", f"This PDF has {pdf.page_count} pages; the limit is {MAX_PAGES}.", 400)
-        pages, total = [], 0
+        total = 0
         for page in pdf:  # stop extracting as soon as the cap is exceeded
-            pages.append(page.get_text())
-            total += len(pages[-1])
+            total += len(page.get_text())
             if total > MAX_TEXT_CHARS:
                 raise AppError(
                     "text_limit",
                     f"This PDF contains too much text; the limit is {MAX_TEXT_CHARS:,} characters.", 400,
                 )
+        pages = extract_pages(pdf)
     if sum(len("".join(p.split())) for p in pages) < MIN_TEXT_CHARS:
         raise AppError("no_text", "This looks like a scanned image. Please upload a text-based PDF.", 400)
     if db.scalar(select(Document.id).where(Document.org_id == org_id, Document.filename == filename)):

@@ -1,0 +1,151 @@
+text,label
+"What is the hostel fee per year?",direct
+"When does the scholarship application close?",direct
+"How much is the tuition fee?",direct
+"What is the late fee per week?",direct
+"How many casual leaves do we get?",direct
+"What is the notice period?",direct
+"How much is the Merit-cum-Means scholarship amount?",direct
+"Where are the company offices?",direct
+"What is the re-evaluation fee per subject?",direct
+"How many public holidays are there in a year?",direct
+"What is the health insurance cover amount?",direct
+"When are scholarship results announced?",direct
+"What is the caution deposit amount?",direct
+"How much is the referral bonus?",direct
+"What is the mess fee?",direct
+"hostel fee kitna hai",direct
+"scholarship ki last date kya hai",direct
+"notice period kitne din ka hai",direct
+"sick leave kitni milti hai",direct
+"tuition fee kitni hai ek saal ki",direct
+"re-evaluation fees kitni hai",direct
+"referral bonus kitna milta hai",direct
+"health insurance cover kitne ka hai",direct
+"छात्रावास शुल्क कितना है?",direct
+"नोटिस अवधि कितने दिन की है?",direct
+"What is the attendance policy?",policy
+"Explain the leave carry forward rules.",policy
+"What are the rules for supplementary exams?",policy
+"What is the refund policy after withdrawal?",policy
+"Tell me about the work from home policy.",policy
+"What is the policy on leave during probation?",policy
+"What are the rules for the blackout period?",policy
+"Explain the gratuity policy.",policy
+"What is the grading system?",policy
+"What happens if I fail more than three subjects?",policy
+"What is the policy on examination malpractice?",policy
+"What are the hostel rules?",policy
+"What is the leave encashment policy?",policy
+"What are the conditions for scholarship renewal?",policy
+"What does the policy say about maternity leave?",policy
+"attendance ka rule kya hai",policy
+"leave carry forward ka niyam batao",policy
+"probation mein leave policy kya hai",policy
+"WFH policy kya hai company ki",policy
+"refund policy samjhao withdrawal ke baad",policy
+"grading system kaise kaam karta hai",policy
+"malpractice karne par kya hota hai",policy
+"gratuity ka rule kya hai",policy
+"उपस्थिति का नियम क्या है?",policy
+"छुट्टी आगे ले जाने का नियम क्या है?",policy
+"How do I apply for re-evaluation?",procedural
+"How can I apply for the scholarship?",procedural
+"What is the process to apply for leave?",procedural
+"How do I pay my fees online?",procedural
+"What documents do I need to submit for the scholarship?",procedural
+"How do I raise a grievance with HR?",procedural
+"What are the steps to withdraw from the institute?",procedural
+"How do I claim health insurance reimbursement?",procedural
+"How do I apply for a semester break?",procedural
+"How can I get my caution deposit back?",procedural
+"How do I submit an expense claim?",procedural
+"What is the procedure to resign?",procedural
+"How do I get cashless hospitalisation approval?",procedural
+"How do I refer a candidate?",procedural
+"Where do I submit my medical certificate for attendance?",procedural
+"re-evaluation ke liye apply kaise kare",procedural
+"scholarship ke liye apply kaise karna hai",procedural
+"leave kaise apply karte hain portal par",procedural
+"fees online kaise bhare",procedural
+"resign karne ka process kya hai",procedural
+"insurance claim kaise kare",procedural
+"grievance kaise raise karu HR ko",procedural
+"caution deposit wapas kaise milega",procedural
+"छात्रवृत्ति के लिए आवेदन कैसे करें?",procedural
+"छुट्टी के लिए आवेदन कैसे करें?",procedural
+"I am in 2nd year with CGPA 8.1 and family income 6 lakh. Am I eligible for the merit scholarship?",eligibility
+"Can I get the merit-cum-means scholarship if my income is 9 lakh?",eligibility
+"Am I eligible for the girl child tuition waiver if my family earns 4.5 lakh?",eligibility
+"I have a state level medal and CGPA 6.8. Do I qualify for the sports scholarship?",eligibility
+"I already get an NSP scholarship. Can I apply for merit-cum-means?",eligibility
+"My attendance is 70% with a medical certificate. Can I sit the exam?",eligibility
+"I joined 3 months ago. Can I take earned leave?",eligibility
+"Am I eligible for gratuity after 4 years?",eligibility
+"Can I work from home during probation?",eligibility
+"I failed 4 subjects. Can I take the supplementary exam?",eligibility
+"I am a first year student with 9 CGPA. Can I get the scholarship?",eligibility
+"Do I qualify for marriage leave if I am still on probation?",eligibility
+"I have worked 6 years. Will I get gratuity?",eligibility
+"Can I take leave on 20 March if I am in a client-facing role?",eligibility
+"Is a 3rd year student with 7.2 CGPA eligible for merit scholarship?",eligibility
+"mera CGPA 8 hai aur income 7 lakh hai kya mujhe scholarship milegi",eligibility
+"main 2nd year mein hoon kya main merit scholarship ke liye eligible hoon",eligibility
+"meri family income 5 lakh hai kya girl child waiver milega",eligibility
+"probation mein hoon kya mujhe earned leave mil sakti hai",eligibility
+"mujhe NSP scholarship milti hai kya merit-cum-means bhi mil sakti hai",eligibility
+"4 saal ho gaye kya gratuity milegi",eligibility
+"meri attendance 72% hai kya exam de sakta hoon",eligibility
+"kya main WFH le sakta hoon probation mein",eligibility
+"मेरा सीजीपीए 8 है और आय 6 लाख है क्या मुझे छात्रवृत्ति मिलेगी?",eligibility
+"क्या मैं परिवीक्षा में अर्जित अवकाश ले सकता हूँ?",eligibility
+"What is the difference between casual leave and sick leave?",comparison
+"Compare the merit scholarship and the sports scholarship.",comparison
+"Which is higher, the hostel fee or the mess fee?",comparison
+"What is the difference between supplementary exam and re-evaluation?",comparison
+"How does the notice period during probation compare to after probation?",comparison
+"Merit-cum-means vs girl child tuition waiver: which is better for me?",comparison
+"Difference between earned leave and casual leave?",comparison
+"Compare maternity leave and paternity leave.",comparison
+"Is the hotel limit higher in metro cities or elsewhere?",comparison
+"Compare the refund within 15 days and within 30 days.",comparison
+"What's the difference between PF and gratuity?",comparison
+"Which scholarship gives more money?",comparison
+"How is SGPA different from CGPA?",comparison
+"Compare health insurance and term life insurance.",comparison
+"Difference between leave without pay and compensatory off?",comparison
+"casual leave aur sick leave mein kya farak hai",comparison
+"merit scholarship aur sports scholarship mein kya antar hai",comparison
+"PF aur gratuity mein difference kya hai",comparison
+"hostel fee zyada hai ya mess fee",comparison
+"probation aur confirm hone ke baad notice period mein kya farak hai",comparison
+"re-evaluation aur supplementary mein kya difference hai",comparison
+"maternity aur paternity leave compare karo",comparison
+"SGPA aur CGPA mein kya fark hai",comparison
+"आकस्मिक अवकाश और बीमारी अवकाश में क्या अंतर है?",comparison
+"योग्यता छात्रवृत्ति और खेल छात्रवृत्ति में क्या अंतर है?",comparison
+"What is the weather in Kanpur today?",out_of_scope
+"Who won the IPL last year?",out_of_scope
+"Write me a poem about the monsoon.",out_of_scope
+"What is the capital of Australia?",out_of_scope
+"Can you help me with my Python homework?",out_of_scope
+"Tell me a joke.",out_of_scope
+"What is the price of bitcoin?",out_of_scope
+"Recommend a good movie to watch.",out_of_scope
+"How do I cook paneer butter masala?",out_of_scope
+"Who is the Prime Minister of India?",out_of_scope
+"What is 245 times 37?",out_of_scope
+"Book a train ticket to Delhi for me.",out_of_scope
+"Translate hello into French.",out_of_scope
+"What are the best stocks to buy now?",out_of_scope
+"Which phone should I buy under 20000?",out_of_scope
+"aaj mausam kaisa hai",out_of_scope
+"koi accha gaana sunao",out_of_scope
+"IPL mein kaun jeeta",out_of_scope
+"mera homework kar do",out_of_scope
+"biryani kaise banate hain",out_of_scope
+"koi joke sunao yaar",out_of_scope
+"bitcoin ka rate kya hai",out_of_scope
+"best phone kaun sa hai 20000 mein",out_of_scope
+"आज मौसम कैसा है?",out_of_scope
+"मुझे एक कविता लिखकर दो।",out_of_scope
