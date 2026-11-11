@@ -1,0 +1,16 @@
+[
+ {"id":1,"org":"org1","category":"direct","question":"What is the re-evaluation fee per course?","status":"answered","question_type":"direct","outcome":null,"reference":"NIT_Academic_Regulations.pdf"},
+ {"id":2,"org":"org1","category":"policy","question":"What is the attendance rule for sitting the semester examination?","status":"answered","question_type":"policy","outcome":null,"reference":"NIT_Academic_Regulations.pdf"},
+ {"id":3,"org":"org2","category":"procedural","question":"How do I apply for leave and how many days in advance?","status":"answered","question_type":"procedural","outcome":null,"reference":"Navyug_Leave_Policy.pdf"},
+ {"id":4,"org":"org1","category":"comparison","question":"What is the difference between the merit-cum-means scholarship and the sports excellence scholarship?","status":"answered","question_type":"comparison","outcome":null,"reference":"NIT_Scholarship_Policy_2025-26.pdf"},
+ {"id":5,"org":"org1","category":"multi-condition ELIGIBLE","question":"I am in 3rd year B.Tech, CGPA 8.2, family income 6 lakh, attendance 85%, and I get no other scholarship. Am I eligible for the merit-cum-means scholarship?","status":"answered","question_type":"eligibility","outcome":"ELIGIBLE","reference":"NIT_Scholarship_Policy_2025-26.pdf"},
+ {"id":6,"org":"org1","category":"multi-condition NOT_ELIGIBLE","question":"I am in 2nd year, CGPA 8.2, income 6.5 lakh, attendance 80%, but I already get a UP post-matric scholarship. Am I eligible for merit-cum-means?","status":"answered","question_type":"eligibility","outcome":"NOT_ELIGIBLE","reference":"NIT_Scholarship_Policy_2025-26.pdf"},
+ {"id":7,"org":"org1","category":"NEEDS_MORE_INFO","question":"My CGPA is 8.5 and my family income is 5 lakh. Can I get the merit-cum-means scholarship?","status":"answered","question_type":"eligibility","outcome":"NEEDS_MORE_INFO","reference":"NIT_Scholarship_Policy_2025-26.pdf"},
+ {"id":8,"org":"org2","category":"Hinglish","question":"Probation ke dauran earned leave ka kya rule hai?","status":"answered","question_type":"policy","outcome":null,"reference":"Navyug_Leave_Policy.pdf","language":"hinglish"},
+ {"id":9,"org":"org1","category":"not in KB","question":"What is the JEE Main cutoff for CSE this year?","status":"no_answer","question_type":null,"outcome":null,"reference":null},
+ {"id":10,"org":"org2","category":"not in KB","question":"What is the company's work from home policy for Fridays?","status":"no_answer","question_type":null,"outcome":null,"reference":null},
+ {"id":11,"org":"org1","category":"cross-tenant","question":"How many days of earned leave does an employee get at Navyug Infotech?","status":"no_answer","question_type":null,"outcome":null,"reference":null},
+ {"id":12,"org":"org2","category":"cross-tenant","question":"What is the merit-cum-means scholarship award amount at Navodaya Institute of Technology?","status":"no_answer","question_type":null,"outcome":null,"reference":null},
+ {"id":13,"org":"org1","category":"direct","question":"What is the hostel fee per year?","status":"answered","question_type":"direct","outcome":null,"reference":"NIT_Admission_and_Fee_Rules.pdf"},
+ {"id":14,"org":"org2","category":"policy","question":"What happens to earned leave above 30 days at year end?","status":"answered","question_type":"policy","outcome":null,"reference":"Navyug_Leave_Policy.pdf"}
+]
