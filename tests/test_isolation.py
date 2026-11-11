@@ -3,7 +3,8 @@ import uuid
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import delete
+from sqlalchemy import delete, select
+from sqlalchemy.exc import OperationalError
 
 from app.db import SessionLocal
 from app.llm import generate
@@ -31,11 +32,12 @@ def mocks(monkeypatch):
     ratelimit.reset()
 
 
-def _make_org(secret: str) -> dict:
+def _make_org(secret: str, created: list) -> dict:
     email = f"iso-{uuid.uuid4().hex[:10]}@example.com"
     body = client.post("/api/auth/register", json={"org_name": "Iso Org", "email": email, "password": "password123"}).json()
     h = {"Authorization": f"Bearer {body['access_token']}"}
     org_id = uuid.UUID(body["org"]["id"])
+    created.append(org_id)  # registered for cleanup before anything else can fail
     with SessionLocal() as db:
         doc = Document(org_id=org_id, filename=f"{secret}.pdf", storage_path="x", page_count=1, size_bytes=1, status="ready")
         db.add(doc)
@@ -48,13 +50,24 @@ def _make_org(secret: str) -> dict:
     return {"id": org_id, "h": h, "token": token, "doc_id": doc_id, "secret": secret}
 
 
+def _delete_orgs(ids: list) -> None:
+    for attempt in range(3):  # survive a dropped DB connection during teardown
+        try:
+            with SessionLocal() as db:
+                db.execute(delete(Organization).where(Organization.id.in_(ids)))
+                db.commit()
+            return
+        except OperationalError:
+            if attempt == 2:
+                raise
+
+
 @pytest.fixture
-def orgs():
-    a, b = _make_org("PURPLE-ELEPHANT-42"), _make_org("GOLDEN-TIGER-77")
-    yield a, b
-    with SessionLocal() as db:
-        db.execute(delete(Organization).where(Organization.id.in_([a["id"], b["id"]])))
-        db.commit()
+def orgs(request):
+    created: list = []
+    # Finalizer is registered first, so it runs even if org setup or the test itself fails.
+    request.addfinalizer(lambda: created and _delete_orgs(created))
+    yield _make_org("PURPLE-ELEPHANT-42", created), _make_org("GOLDEN-TIGER-77", created)
 
 
 def ask(token, question="What is the secret code phrase?"):
@@ -186,3 +199,13 @@ def test_no_answer_trace_hides_filenames(orgs, monkeypatch):
     body = ask(a["token"], "Who won the IPL?").json()
     summary = next(t["summary"] for t in body["trace"] if t["step"] == "retrieval")
     assert ".pdf" not in summary and "not enough" in summary
+
+
+def test_teardown_deletes_orgs_even_when_setup_fails(request):
+    created: list = []
+    with pytest.raises(RuntimeError):
+        _make_org("TEARDOWN-CHECK-1", created)
+        raise RuntimeError("simulated failure after the org was created")
+    _delete_orgs(created)
+    with SessionLocal() as db:
+        assert db.scalar(select(Organization.id).where(Organization.id.in_(created))) is None
