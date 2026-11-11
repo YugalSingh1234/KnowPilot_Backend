@@ -1,3 +1,4 @@
+import logging
 import re
 
 from fastapi import Depends, FastAPI
@@ -31,6 +32,8 @@ class SplitCORS:
         return await self.private(scope, receive, send)
 
 
+logging.basicConfig(level=logging.INFO)  # serverless has no uvicorn log config; make INFO timing lines visible
+logging.getLogger("httpx").setLevel(logging.WARNING)
 app = FastAPI(title="KnowPilot", version=APP_VERSION)
 app.add_middleware(SplitCORS)
 register_error_handlers(app)

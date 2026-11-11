@@ -1,4 +1,6 @@
+import logging
 import secrets
+import time
 
 import email_validator
 from typing import Annotated
@@ -15,6 +17,7 @@ from app.models import AssistantToken, Organization
 from app.security import create_access_token, get_current_org, hash_password, verify_password
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+log = logging.getLogger("knowpilot.auth")
 
 # Allow the reserved ".test" TLD so demo accounts (admin@navodaya.test) can't collide with real domains.
 if "test" in email_validator.SPECIAL_USE_DOMAIN_NAMES:
@@ -67,8 +70,13 @@ def register(body: RegisterIn, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(body: LoginIn, db: Session = Depends(get_db)):
+    t0 = time.perf_counter()
     org = db.scalar(select(Organization).where(Organization.email == body.email.lower()))
-    if org is None or not verify_password(body.password, org.password_hash):
+    t1 = time.perf_counter()
+    ok = org is not None and verify_password(body.password, org.password_hash)
+    t2 = time.perf_counter()
+    log.info("login timing db=%.0fms bcrypt=%.0fms total=%.0fms", (t1 - t0) * 1000, (t2 - t1) * 1000, (t2 - t0) * 1000)
+    if not ok:
         raise AppError("invalid_credentials", "Invalid email or password.", 401)
     return _auth_out(org)
 

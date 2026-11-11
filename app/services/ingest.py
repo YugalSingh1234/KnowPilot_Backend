@@ -3,7 +3,6 @@ import logging
 import re
 import uuid
 
-import pymupdf
 from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -100,6 +99,8 @@ def validate_pdf(db: Session, org_id, filename: str, data: bytes) -> list[str]:
     """Run checks 1-7 in order; return the text of each page."""
     check_file(filename, data[:5], len(data))
     _check_document_limit(db, org_id)
+    import pymupdf  # lazy: PyMuPDF only loads on upload
+
     try:
         pdf = pymupdf.open(stream=data, filetype="pdf")
     except Exception:

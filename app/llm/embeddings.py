@@ -3,8 +3,6 @@ import time
 
 import httpcore
 import httpx
-import numpy as np
-from google.genai import errors, types
 
 from app.config import get_settings
 from app.errors import AppError
@@ -24,6 +22,8 @@ def llm_unavailable() -> AppError:
 
 
 def _retryable(e: Exception) -> bool:
+    from google.genai import errors
+
     if isinstance(e, errors.APIError):
         return e.code == 429 or (e.code or 0) >= 500
     # timeouts, connection resets (google-genai can surface raw httpcore errors too)
@@ -47,6 +47,9 @@ def call_with_retry(fn):
 
 def _embed(texts: list[str], task_type: str) -> list[list[float]]:
     s = get_settings()
+    import numpy as np
+    from google.genai import types
+
     cfg = types.EmbedContentConfig(task_type=task_type, output_dimensionality=s.EMBED_DIM)
     resp = call_with_retry(
         lambda: get_client().models.embed_content(model=s.GEMINI_EMBED_MODEL, contents=texts, config=cfg)

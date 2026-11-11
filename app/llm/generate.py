@@ -3,7 +3,6 @@ import logging
 from pathlib import Path
 from typing import Literal
 
-from google.genai import types
 from pydantic import BaseModel
 
 from app.config import get_settings
@@ -68,6 +67,8 @@ def _prompt(name: str, **kw) -> str:
 
 
 def _generate(prompt: str, schema: type[BaseModel]):
+    from google.genai import types
+
     config = types.GenerateContentConfig(temperature=0.1, response_mime_type="application/json", response_schema=schema)
     resp = call_with_retry(
         lambda: get_client().models.generate_content(

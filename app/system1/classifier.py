@@ -2,10 +2,6 @@
 from functools import lru_cache
 from pathlib import Path
 
-import joblib
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import FeatureUnion, Pipeline
-from sklearn.feature_extraction.text import TfidfVectorizer
 
 HERE = Path(__file__).resolve().parent
 DATA_PATH = HERE / "data" / "question_types.csv"
@@ -15,7 +11,11 @@ MIN_CONFIDENCE = 0.40
 FALLBACK = "policy"
 
 
-def build_pipeline() -> Pipeline:
+def build_pipeline():
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import FeatureUnion, Pipeline
+    from sklearn.feature_extraction.text import TfidfVectorizer
+
     return Pipeline([
         ("features", FeatureUnion([
             ("word", TfidfVectorizer(analyzer="word", ngram_range=(1, 2), lowercase=True, sublinear_tf=True)),
@@ -26,7 +26,9 @@ def build_pipeline() -> Pipeline:
 
 
 @lru_cache
-def _model() -> Pipeline:
+def _model():
+    import joblib  # lazy: scikit-learn/joblib only load on the first /api/ask
+
     # joblib uses pickle: safe here only because MODEL_PATH is our own artifact, built by
     # scripts/train_classifier.py and committed. Never point this at a user-supplied file.
     return joblib.load(MODEL_PATH)
