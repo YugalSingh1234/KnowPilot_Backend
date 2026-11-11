@@ -38,6 +38,7 @@ HEADING = ParagraphStyle("h", fontName="Body-Bold", fontSize=13.5, leading=18, s
 TITLE = ParagraphStyle("t", fontName="Body-Bold", fontSize=19, leading=24, spaceAfter=4,
                        textColor=colors.HexColor("#1f3b57"))
 SUB = ParagraphStyle("s", parent=BODY, textColor=colors.grey, spaceAfter=12)
+CELL = ParagraphStyle("cell", fontName="Body", fontSize=8.5, leading=10.5)
 BIG = ParagraphStyle("big", fontName="Body-Bold", fontSize=22, leading=30, alignment=TA_CENTER)
 
 
@@ -76,7 +77,9 @@ class Doc:
         for q, a in qa:
             self.flow += [Paragraph(f"<b>Q. {q}</b>", BODY), Paragraph(f"A. {a}", BODY)]
 
-    def table(self, rows: list[list[str]], widths: list[float]):
+    def table(self, rows: list[list[str]], widths: list[float], wrap: bool = False):
+        if wrap:  # long cells (emails) wrap inside their column instead of overflowing
+            rows = rows[:1] + [[Paragraph(c, CELL) for c in r] for r in rows[1:]]
         t = Table(rows, colWidths=[w * inch for w in widths], hAlign="LEFT", repeatRows=1)
         t.setStyle(TableStyle([
             ("FONTNAME", (0, 0), (-1, -1), "Body"), ("FONTNAME", (0, 0), (-1, 0), "Body-Bold"),
@@ -703,6 +706,32 @@ def nit_factbook():
                  "Bus: Rama Devi bus stand is 9 km away. City buses 14 and 22 stop at the main gate.",
                  "Institute buses pick up from Kanpur Central station on the day before each semester starts."],
     )
+    d.flow.append(PageBreak())
+    d.section(
+        "How to Apply for Admission",
+        "Applications for 2025-26 are made online only on the admission portal "
+        "<b>admissions.navodaya-kanpur.example</b>. B.Tech seats are filled through JEE Main scores and AKTU "
+        "counselling; MBA and MCA seats through CUET-PG or the institute entrance test.",
+        bullets=["<b>Step 1:</b> Register on the admission portal with your mobile number and email, and verify the OTP.",
+                 f"<b>Step 2:</b> Fill in the application form and pay the application fee of <b>{inr(1200)}</b> "
+                 f"({inr(600)} for SC/ST and PwD candidates) online by UPI, card or net banking.",
+                 "<b>Step 3:</b> Upload scanned documents (PDF or JPG, each under 1 MB).",
+                 "<b>Step 4:</b> Download the application form and note the application number.",
+                 "<b>Step 5:</b> Check the merit list on the portal and attend document verification on the "
+                 "allotted date.",
+                 "<b>Step 6:</b> Pay Instalment 1 of the annual fee to confirm the seat."],
+    )
+    d.table([["Admission event", "Date"], ["Application portal opens", "1 May 2025"],
+             ["Last date to apply", "15 June 2025"], ["Merit list published", "25 June 2025"],
+             ["Document verification", "1-10 July 2025"], ["Instalment 1 fee due", "15 July 2025"],
+             ["Classes begin", "1 August 2025"]], [3.0, 2.4])
+    d.flow.append(Paragraph(
+        "<b>Documents needed:</b> Class 10 and Class 12 mark sheets, Class 12 passing certificate, JEE Main or "
+        "entrance test scorecard, AKTU counselling allotment letter (B.Tech), transfer and migration "
+        "certificates, category or income certificate if applicable, Aadhaar card and four passport-size "
+        f"photographs. <b>Fees:</b> the B.Tech tuition fee is {inr(145000)} per year; with hostel and mess the "
+        f"total is {inr(245000)} per year, plus a refundable caution deposit of {inr(10000)}. "
+        "Admission queries: 0512-2970-111, admissions@navodaya-kanpur.example.", BODY))
     d.section("Departments and Programs",
               "The institute has 7 academic departments. The table below shows the annual intake (seats) per program.")
     d.table([["Program", "Department", "Duration", "Intake"],
@@ -783,16 +812,24 @@ def nit_factbook():
              ["End-semester exams (even)", "4-20 May 2026"], ["Summer vacation", "21 May - 31 July 2026"]],
             [3.0, 2.4])
     d.section(
-        "Office Timings and Contacts",
+        "Help Desk and Contacts",
         "Administrative offices are open <b>9:30 am to 5:30 pm, Monday to Saturday</b> (closed on the 2nd and "
-        "4th Saturday and on Sundays). Lunch break is 1:00 pm to 1:45 pm.",
-        bullets=["Main reception: 0512-2970-100, info@navodaya-kanpur.example",
-                 "Admissions: 0512-2970-111, admissions@navodaya-kanpur.example",
-                 "Accounts and fees: 0512-2970-120, accounts@navodaya-kanpur.example",
-                 "Examination cell: 0512-2970-130, exams@navodaya-kanpur.example",
-                 "Hostel office: 0512-2970-140, hostel@navodaya-kanpur.example",
-                 "Training and Placement: 0512-2970-150, placements@navodaya-kanpur.example"],
+        "4th Saturday and on Sundays). Lunch break is 1:00 pm to 1:45 pm. The table lists each office's "
+        "phone, email and timings. All offices are in the Administrative Block unless stated otherwise.",
     )
+    d.table([["Office", "Phone", "Email", "Timings"],
+             ["Main reception / help desk", "0512-2970-100", "info@navodaya-kanpur.example", "8:00 am - 8:00 pm, all days"],
+             ["Admissions", "0512-2970-111", "admissions@navodaya-kanpur.example", "9:30 am - 5:30 pm, Mon-Sat"],
+             ["Accounts and fees", "0512-2970-120", "accounts@navodaya-kanpur.example", "10:00 am - 4:00 pm, Mon-Fri"],
+             ["Examination cell", "0512-2970-130", "exams@navodaya-kanpur.example", "9:30 am - 5:30 pm, Mon-Fri"],
+             ["Hostel office (Raman Hall)", "0512-2970-140", "hostel@navodaya-kanpur.example", "9:00 am - 7:00 pm, all days"],
+             ["Training and Placement", "0512-2970-150", "placements@navodaya-kanpur.example", "9:30 am - 5:30 pm, Mon-Fri"],
+             ["Scholarship cell", "0512-2970-160", "scholarship@navodaya-kanpur.example", "10:00 am - 4:00 pm, Mon-Fri"],
+             ["Library", "0512-2970-170", "library@navodaya-kanpur.example", "8:00 am - 10:00 pm"],
+             ["IT / Wi-Fi support", "0512-2970-180", "itsupport@navodaya-kanpur.example", "8:00 am - 10:00 pm, all days"],
+             ["Medical centre (emergency)", "0512-2970-108", "medical@navodaya-kanpur.example", "24 hours"],
+             ["Anti-ragging helpline", "0512-2970-199", "antiragging@navodaya-kanpur.example", "24 hours"]],
+            [1.65, 1.0, 2.35, 1.6], wrap=True)
     d.flow.append(PageBreak())
     d.section(
         "Anti-Ragging",
@@ -965,14 +1002,21 @@ def navyug_factbook():
         "escort after 8:00 pm.",
     )
     d.section(
-        "HR Contacts",
-        bullets=["HR helpdesk (all offices): hr@navyug.example, 020-6740-2000, 9:30 am to 6:30 pm",
-                 "Payroll queries: payroll@navyug.example, extension 2010",
-                 "Pune HR: Kavita Shinde, kavita.shinde@navyug.example, 020-6740-2001",
-                 "Bengaluru HR: Arjun Hegde, arjun.hegde@navyug.example, 080-4920-3001",
-                 "Noida HR: Ritu Malhotra, ritu.malhotra@navyug.example, 0120-461-4001",
-                 "Internal Complaints Committee (POSH): icc@navyug.example"],
+        "Who to Contact",
+        "Use the table below to reach the right team. Raise tickets on the Navyug Connect portal where possible; "
+        "email and phone also work.",
     )
+    d.table([["For", "Contact", "Email", "Phone / timings"],
+             ["HR helpdesk (all offices)", "HR Shared Services", "hr@navyug.example", "020-6740-2000, 9:30 am - 6:30 pm"],
+             ["HR, Pune", "Kavita Shinde", "kavita.shinde@navyug.example", "020-6740-2001"],
+             ["HR, Bengaluru", "Arjun Hegde", "arjun.hegde@navyug.example", "080-4920-3001"],
+             ["HR, Noida", "Ritu Malhotra", "ritu.malhotra@navyug.example", "0120-461-4001"],
+             ["IT helpdesk (laptop, VPN, email)", "IT Service Desk", "it-helpdesk@navyug.example", "Ext. 4000, 8:00 am - 10:00 pm"],
+             ["IT security incidents", "Security team", "security@navyug.example", "Ext. 4099, 24 hours"],
+             ["Payroll, salary slips, tax", "Payroll team", "payroll@navyug.example", "Ext. 2010, 10:00 am - 5:00 pm"],
+             ["Expense claims", "Finance", "expenses@navyug.example", "Ext. 2020"],
+             ["POSH complaints", "Internal Complaints Committee", "icc@navyug.example", "Confidential"]],
+            [1.75, 1.45, 1.95, 1.65], wrap=True)
     d.flow.append(PageBreak())
     d.faq([
         ("When was Navyug founded?", "In 2009."),
