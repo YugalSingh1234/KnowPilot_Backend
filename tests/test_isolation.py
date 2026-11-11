@@ -178,3 +178,11 @@ def test_db_drop_retried_once_then_503(orgs, monkeypatch):
     r = ask(a["token"])
     assert r.status_code == 503
     assert r.json()["error"] == {"code": "service_busy", "message": "Please try again in a moment."}
+
+
+def test_no_answer_trace_hides_filenames(orgs, monkeypatch):
+    a, _ = orgs
+    monkeypatch.setattr(orchestrator.classifier, "classify", lambda q: {"label": "out_of_scope", "confidence": 0.9})
+    body = ask(a["token"], "Who won the IPL?").json()
+    summary = next(t["summary"] for t in body["trace"] if t["step"] == "retrieval")
+    assert ".pdf" not in summary and "not enough" in summary

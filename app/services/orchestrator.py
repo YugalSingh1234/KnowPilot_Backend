@@ -107,6 +107,10 @@ def ask(db: Session, org_id, question: str) -> dict:
             answer = BUSY + "\n\n" + "\n\n".join(
                 f"{r['filename']} — Page {r['page']}: {r['snippet']}" for r in references)
 
+    if status == "no_answer":  # don't reveal which document came closest to an unanswered question
+        for step in trace.steps:
+            if step["step"] == "retrieval" and chunks:
+                step["summary"] = f"{len(chunks)} passages; best match {max(c['vector_score'] for c in chunks):.2f} (not enough)"
     decision_out = _decision_out(decision) if decision else None
     row = QuestionLog(  # no question text, no personal facts
         org_id=org_id, language=language, question_type=qtype, status=status,
