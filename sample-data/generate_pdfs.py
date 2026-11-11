@@ -684,6 +684,342 @@ def navyug_benefits():
     d.save(ROOT / "org2" / "Navyug_Benefits_Policy.pdf")
 
 
+# ---------------------------------------------------------------- Fact books (one per org)
+def nit_factbook():
+    d = Doc(NIT, "Institute Fact Book 2025-26", "Key facts and figures about the institute")
+    d.section(
+        "About the Institute",
+        "Navodaya Institute of Technology (NIT Kanpur) is a private engineering institute <b>established in 1998</b>. "
+        "It is affiliated to Dr. A.P.J. Abdul Kalam Technical University (AKTU), Lucknow, and approved by AICTE. "
+        "The campus is spread over <b>112 acres</b>. The institute motto is 'Knowledge, Skill, Service'.",
+    )
+    d.section(
+        "Location and Address",
+        "The institute is located at <b>NH-19 (Kanpur-Allahabad Highway), Chakeri Road, Kanpur, Uttar Pradesh "
+        "208008, India</b>. The campus is about 14 km from the Kanpur city centre.",
+        bullets=["Nearest railway station: <b>Kanpur Central</b>, 16 km (about 35 minutes by road).",
+                 "Nearest airport: <b>Kanpur Airport (Chakeri)</b>, 6 km. Lucknow (Chaudhary Charan Singh) "
+                 "International Airport is 92 km away (about 2 hours).",
+                 "Bus: Rama Devi bus stand is 9 km away. City buses 14 and 22 stop at the main gate.",
+                 "Institute buses pick up from Kanpur Central station on the day before each semester starts."],
+    )
+    d.section("Departments and Programs",
+              "The institute has 7 academic departments. The table below shows the annual intake (seats) per program.")
+    d.table([["Program", "Department", "Duration", "Intake"],
+             ["B.Tech Computer Science and Engineering", "CSE", "4 years", "180"],
+             ["B.Tech CSE (AI and Machine Learning)", "CSE", "4 years", "60"],
+             ["B.Tech Electronics and Communication", "ECE", "4 years", "120"],
+             ["B.Tech Electrical Engineering", "EE", "4 years", "60"],
+             ["B.Tech Mechanical Engineering", "ME", "4 years", "90"],
+             ["B.Tech Civil Engineering", "CE", "4 years", "60"],
+             ["MBA", "Management Studies", "2 years", "120"],
+             ["MCA", "Computer Applications", "2 years", "60"],
+             ["M.Tech (CSE, VLSI)", "CSE / ECE", "2 years", "36"]], [2.9, 1.5, 0.9, 0.7])
+    d.flow.append(PageBreak())
+    d.section("Student Strength",
+              "The institute has <b>2,860 students</b> in total in 2025-26: 1,812 male and 1,048 female students.")
+    d.table([["Year", "Male", "Female", "Total"],
+             ["B.Tech 1st year", "382", "188", "570"], ["B.Tech 2nd year", "376", "184", "560"],
+             ["B.Tech 3rd year", "362", "178", "540"], ["B.Tech 4th year", "348", "172", "520"],
+             ["MBA (both years)", "142", "96", "238"], ["MCA (both years)", "98", "60", "158"],
+             ["M.Tech (both years)", "40", "30", "70"], ["PhD scholars", "64", "140", "204"],
+             ["Total", "1,812", "1,048", "2,860"]], [2.4, 1.0, 1.0, 1.0])
+    d.section(
+        "Faculty and Staff",
+        "There are <b>186 faculty members</b>: 28 Professors, 46 Associate Professors and 112 Assistant Professors. "
+        "122 faculty members hold a PhD. The student to faculty ratio is about 15:1. There are 240 non-teaching staff.",
+    )
+    d.flow.append(PageBreak())
+    d.section("Hostels", "There are 6 hostels with a total capacity of <b>1,900 students</b>.")
+    d.table([["Hostel", "For", "Capacity", "Room type"],
+             ["Aryabhata Hall", "Boys (1st year)", "400", "Triple sharing"],
+             ["Raman Hall", "Boys", "380", "Double sharing"], ["Bose Hall", "Boys", "360", "Double sharing"],
+             ["Kalam Hall", "Boys (final year)", "200", "Single"],
+             ["Sarojini Hall", "Girls", "340", "Double sharing"], ["Kalpana Hall", "Girls", "220", "Double sharing"]],
+            [1.8, 1.7, 0.9, 1.6])
+    d.flow.append(Paragraph("All hostels have 24-hour water, power backup, Wi-Fi and a common room. Hostel entry "
+                            "closes at 10:00 pm.", BODY))
+    d.flow.append(PageBreak())
+    d.section(
+        "Library",
+        "The Central Library has <b>68,000 books</b>, 1,450 e-journals (IEEE, Springer, ScienceDirect) and a "
+        "reading hall with 300 seats. It is open <b>8:00 am to 10:00 pm</b> on working days and 10:00 am to "
+        "5:00 pm on Sundays. Students may borrow 4 books for 14 days. The late fine is ₹5 per day per book.",
+    )
+    d.section(
+        "Laboratories and Facilities",
+        "The institute has 54 laboratories, including an AI and GPU computing lab (40 GPU workstations), a VLSI "
+        "design lab, a robotics lab, an IoT lab, a CNC and advanced manufacturing lab, a concrete testing lab and "
+        "an innovation and incubation centre. Computer labs have 900 systems in total.",
+    )
+    d.section(
+        "Sports",
+        "Facilities include a cricket ground, a football ground, a 400 m athletics track, 4 basketball courts, "
+        "2 volleyball courts, 6 badminton courts (indoor), table tennis, a gymnasium and a 25 m swimming pool "
+        "(open March to October). The annual sports fest is called <b>Spardha</b> and is held in February.",
+    )
+    d.section(
+        "Medical Centre",
+        "The campus medical centre is open <b>24 hours</b> with 2 resident doctors, 4 nurses and a 10-bed "
+        "observation ward. An ambulance is on call at all times. Serious cases are referred to Regency Hospital, "
+        "Kanpur (11 km). Emergency number: 0512-2970-108.",
+    )
+    d.flow.append(PageBreak())
+    d.section("Placements 2024-25",
+              "<b>486 students</b> were placed out of 548 eligible (89%). <b>142 companies</b> visited the campus.")
+    d.table([["Measure", "Value"], ["Highest package", "42 LPA"], ["Median package", "7.2 LPA"],
+             ["Average package", "8.4 LPA"], ["Median package (CSE)", "9.5 LPA"],
+             ["Median package (MBA)", "6.8 LPA"]], [2.6, 1.6])
+    d.flow.append(Paragraph("Top recruiters: Infosys, TCS, Wipro, Accenture, Amazon, Deloitte, L&amp;T, Tata Motors, "
+                            "Samsung R&amp;D, Zomato and HCLTech. The Training and Placement Officer is Dr. Rakesh "
+                            "Tiwari (placements@navodaya-kanpur.example).", BODY))
+    d.flow.append(PageBreak())
+    d.section("Academic Calendar 2025-26")
+    d.table([["Event", "Date"], ["Odd semester classes begin", "1 August 2025"],
+             ["Mid-semester exams (odd)", "22-27 September 2025"], ["Diwali break", "18-26 October 2025"],
+             ["End-semester exams (odd)", "1-15 December 2025"], ["Winter break", "16 December 2025 - 4 January 2026"],
+             ["Even semester classes begin", "5 January 2026"], ["Spardha sports fest", "12-14 February 2026"],
+             ["Mid-semester exams (even)", "2-7 March 2026"], ["Tech fest Navotsav", "27-29 March 2026"],
+             ["End-semester exams (even)", "4-20 May 2026"], ["Summer vacation", "21 May - 31 July 2026"]],
+            [3.0, 2.4])
+    d.section(
+        "Office Timings and Contacts",
+        "Administrative offices are open <b>9:30 am to 5:30 pm, Monday to Saturday</b> (closed on the 2nd and "
+        "4th Saturday and on Sundays). Lunch break is 1:00 pm to 1:45 pm.",
+        bullets=["Main reception: 0512-2970-100, info@navodaya-kanpur.example",
+                 "Admissions: 0512-2970-111, admissions@navodaya-kanpur.example",
+                 "Accounts and fees: 0512-2970-120, accounts@navodaya-kanpur.example",
+                 "Examination cell: 0512-2970-130, exams@navodaya-kanpur.example",
+                 "Hostel office: 0512-2970-140, hostel@navodaya-kanpur.example",
+                 "Training and Placement: 0512-2970-150, placements@navodaya-kanpur.example"],
+    )
+    d.flow.append(PageBreak())
+    d.section(
+        "Anti-Ragging",
+        "Ragging is strictly banned and is a criminal offence. The Anti-Ragging Committee is headed by the Dean of "
+        "Students. Complaints can be made to the anti-ragging helpline <b>0512-2970-199</b> (24 hours), by email "
+        "to antiragging@navodaya-kanpur.example, or to the national helpline 1800-180-5522. Punishment ranges "
+        "from suspension to expulsion and an FIR.",
+    )
+    d.section(
+        "Grievance Redressal",
+        "Students submit grievances on the student portal or to grievance@navodaya-kanpur.example. The Student "
+        "Grievance Redressal Committee acknowledges a grievance within <b>3 working days</b> and resolves it "
+        "within <b>15 working days</b>. A student who is not satisfied may appeal to the Ombudsperson appointed "
+        "by AKTU.",
+    )
+    d.section(
+        "Transport, Canteen and Wi-Fi",
+        f"Institute buses run on <b>18 routes</b> across Kanpur from 7:00 am; the annual bus fee is {inr(24000)}. "
+        "The main canteen is open 7:30 am to 9:30 pm; there is also a food court with 6 outlets and a night "
+        "canteen near the hostels open until 1:00 am. The whole campus has <b>1 Gbps Wi-Fi</b>; each student gets "
+        "a login with a daily limit of 5 GB.",
+    )
+    d.flow.append(PageBreak())
+    d.section(
+        "Clubs and Activities",
+        "There are 32 student clubs, including the Coding Club, Robotics Club, E-Cell (entrepreneurship), "
+        "Literary Society, Music Club (Swaranjali), Dance Club, Drama Club (Rangmanch), Photography Club, NSS and "
+        "NCC. The annual technical fest is <b>Navotsav</b> and the cultural fest is <b>Utsav</b> (November).",
+    )
+    d.flow.append(PageBreak())
+    d.faq([
+        ("How many students are in the institute?", "2,860 students in 2025-26 (1,812 male, 1,048 female)."),
+        ("Where is the institute located?", "NH-19, Chakeri Road, Kanpur, Uttar Pradesh 208008."),
+        ("When was the institute established?", "In 1998."),
+        ("How big is the campus?", "112 acres."),
+        ("Which university is the institute affiliated to?", "AKTU, Lucknow. It is approved by AICTE."),
+        ("Which is the nearest railway station?", "Kanpur Central, 16 km away."),
+        ("Which is the nearest airport?", "Kanpur Airport (Chakeri), 6 km away. Lucknow airport is 92 km away."),
+        ("How many departments are there?", "7 academic departments."),
+        ("What is the intake for B.Tech CSE?", "180 seats, plus 60 seats in CSE (AI and Machine Learning)."),
+        ("What is the total B.Tech intake?", "570 seats per year."),
+        ("Does the institute offer MBA and MCA?", "Yes. MBA has 120 seats and MCA has 60 seats."),
+        ("How many girl students are there?", "1,048."),
+        ("How many faculty members are there?", "186, of whom 122 hold a PhD."),
+        ("What is the student to faculty ratio?", "About 15:1."),
+        ("How many hostels are there?", "6 hostels (4 for boys, 2 for girls) with 1,900 places."),
+        ("Do first-year students get single rooms?", "No. First-year boys stay in triple rooms in Aryabhata Hall."),
+        ("What are the library timings?", "8:00 am to 10:00 pm on working days; 10:00 am to 5:00 pm on Sundays."),
+        ("How many books can I borrow?", "4 books for 14 days. The fine is ₹5 per day per book."),
+        ("Is there a swimming pool?", "Yes, a 25 m pool open from March to October."),
+        ("Is there a doctor on campus?", "Yes. The medical centre is open 24 hours with 2 resident doctors."),
+        ("What is the highest placement package?", "42 LPA in 2024-25."),
+        ("What is the median placement package?", "7.2 LPA overall; 9.5 LPA for CSE."),
+        ("What percentage of students got placed?", "89% (486 of 548 eligible students)."),
+        ("Which companies recruit from the campus?", "Infosys, TCS, Wipro, Accenture, Amazon, Deloitte, L&amp;T and others."),
+        ("When do classes start?", "The odd semester starts on 1 August 2025; the even semester on 5 January 2026."),
+        ("When are the end-semester exams?", "1-15 December 2025 and 4-20 May 2026."),
+        ("When is the summer vacation?", "21 May to 31 July 2026."),
+        ("What are the office timings?", "9:30 am to 5:30 pm, Monday to Saturday (2nd and 4th Saturday closed)."),
+        ("What is the admissions phone number?", "0512-2970-111 (admissions@navodaya-kanpur.example)."),
+        ("How do I report ragging?", "Call 0512-2970-199 (24 hours) or email antiragging@navodaya-kanpur.example."),
+        ("How long does a grievance take to resolve?", "Acknowledged in 3 working days and resolved in 15 working days."),
+        ("Is there college bus service?", f"Yes, on 18 routes across Kanpur. The annual bus fee is {inr(24000)}."),
+        ("What are the canteen timings?", "7:30 am to 9:30 pm; the night canteen is open until 1:00 am."),
+        ("Is there Wi-Fi on campus?", "Yes, 1 Gbps campus-wide with a 5 GB daily limit per student."),
+        ("How many clubs are there?", "32 student clubs, plus NSS and NCC."),
+        ("What is the name of the tech fest?", "Navotsav, held 27-29 March 2026."),
+        ("What is the cultural fest called?", "Utsav, held in November."),
+        ("What is the hostel entry time?", "Hostel entry closes at 10:00 pm."),
+        ("How many PhD scholars are there?", "204."),
+        ("How many laboratories are there?", "54 laboratories with 900 computer systems in total."),
+    ])
+    d.save(ROOT / "org1" / "NIT_Institute_Fact_Book_2025-26.pdf")
+
+
+def navyug_factbook():
+    d = Doc(NAV, "Company Profile and FAQ", "Facts about Navyug Infotech for employees and candidates")
+    d.section(
+        "About the Company",
+        "Navyug Infotech Pvt. Ltd. is an IT services company <b>founded in 2009</b> by Anil Deshmukh and Priya "
+        "Raghavan. It builds software, cloud and data solutions for banking, retail and healthcare clients in "
+        "India, the Middle East and Europe. Revenue in FY 2025-26 was ₹412 crore.",
+    )
+    d.section(
+        "Headquarters and Offices",
+        "The headquarters is at <b>Navyug Towers, Plot 18, Rajiv Gandhi Infotech Park, Phase 2, Hinjewadi, "
+        "Pune, Maharashtra 411057</b>. The company has <b>2,450 employees</b> across three offices.",
+    )
+    d.table([["Office", "Address", "Employees"],
+             ["Pune (HQ)", "Plot 18, Hinjewadi Phase 2, Pune 411057", "1,280"],
+             ["Bengaluru", "Prestige Tech Park, Marathahalli, Bengaluru 560103", "760"],
+             ["Noida", "Tower B, Sector 62, Noida, Uttar Pradesh 201309", "410"],
+             ["Total", "", "2,450"]], [1.1, 3.8, 0.9])
+    d.flow.append(PageBreak())
+    d.section("Business Units")
+    d.table([["Business unit", "Focus", "Head", "Employees"],
+             ["Banking and Financial Services", "Core banking, payments", "Meera Kulkarni", "720"],
+             ["Retail and Consumer", "E-commerce, supply chain", "Rohit Bansal", "540"],
+             ["Healthcare", "Hospital, insurance platforms", "Dr. Sana Qureshi", "380"],
+             ["Cloud and Data", "Cloud, analytics, AI", "Vikram Iyer", "560"],
+             ["Corporate functions", "HR, finance, IT, admin", "Neha Joshi", "250"]], [2.1, 1.8, 1.2, 0.8])
+    d.section(
+        "Working Hours",
+        "Standard working hours are <b>9:30 am to 6:30 pm, Monday to Friday</b>, including a 1-hour lunch break. "
+        "Core hours, when everyone must be available, are 11:00 am to 4:00 pm. Saturdays and Sundays are off. "
+        "Employees on client support shifts follow their project's shift roster and receive a shift allowance "
+        f"of {inr(300)} per night shift.",
+    )
+    d.flow.append(PageBreak())
+    d.section("Holiday List 2026",
+              "Each office observes <b>12 public holidays</b> in 2026. Holidays that differ by office are marked.")
+    d.table([["Date", "Holiday", "Pune", "Bengaluru", "Noida"],
+             ["26 Jan", "Republic Day", "Yes", "Yes", "Yes"], ["4 Mar", "Holi", "Yes", "No", "Yes"],
+             ["19 Mar", "Gudi Padwa / Ugadi", "Yes", "Yes", "No"], ["21 Mar", "Eid ul-Fitr", "Yes", "Yes", "Yes"],
+             ["30 Mar", "Ram Navami", "No", "No", "Yes"], ["1 May", "Maharashtra Day / May Day", "Yes", "Yes", "No"],
+             ["15 Aug", "Independence Day", "Yes", "Yes", "Yes"], ["14 Sep", "Ganesh Chaturthi", "Yes", "Yes", "Yes"],
+             ["2 Oct", "Gandhi Jayanti", "Yes", "Yes", "Yes"], ["20 Oct", "Dussehra", "Yes", "Yes", "Yes"],
+             ["1 Nov", "Kannada Rajyotsava", "No", "Yes", "No"], ["8 Nov", "Diwali", "Yes", "Yes", "Yes"],
+             ["9 Nov", "Diwali (Balipratipada)", "Yes", "Yes", "Yes"], ["24 Nov", "Guru Nanak Jayanti", "No", "No", "Yes"],
+             ["25 Dec", "Christmas", "Yes", "Yes", "Yes"]], [0.9, 2.2, 0.7, 0.9, 0.7])
+    d.section(
+        "Dress Code",
+        "Business casual from Monday to Thursday: collared shirts or kurtas, trousers, salwar suits or sarees, "
+        "and closed shoes. <b>Fridays are casual</b>: jeans and T-shirts are allowed. Shorts and slippers are not "
+        "allowed at any time. Formal wear is required for client visits.",
+    )
+    d.flow.append(PageBreak())
+    d.section(
+        "IT and Laptop Policy",
+        "Every employee receives a company laptop on the day of joining: developers get 32 GB RAM machines and "
+        "others get 16 GB RAM machines. Laptops are replaced every <b>4 years</b>. Disk encryption, the company "
+        "antivirus and VPN are mandatory. Personal software needs IT approval. A lost laptop must be reported to "
+        "it-helpdesk@navyug.example within <b>24 hours</b>; the first loss caused by negligence is recovered at "
+        f"{inr(15000)}. The IT helpdesk is open 8:00 am to 10:00 pm on extension 4000.",
+    )
+    d.flow.append(PageBreak())
+    d.section("Travel and Expense Reimbursement Limits",
+              "Claims must be submitted with bills within <b>30 days</b> of travel on the expense portal.")
+    d.table([["Item", "Band A-B (up to Senior Engineer)", "Band C-D (Lead and above)"],
+             ["Hotel, metro city (per night)", inr(5000), inr(7500)],
+             ["Hotel, other cities (per night)", inr(3500), inr(5000)],
+             ["Meals on travel (per day)", inr(1000), inr(1500)], ["Train", "3rd AC", "2nd AC"],
+             ["Flight (journeys over 500 km)", "Economy", "Economy"], ["Local cab (per day)", inr(800), inr(1200)],
+             ["Mobile bill (per month)", inr(500), inr(1000)]], [2.4, 2.0, 1.8])
+    d.section(
+        "Training and Learning",
+        "New joiners complete a <b>4-week induction</b> programme called Navyug Launchpad. Every employee must "
+        "complete at least <b>40 learning hours</b> per year. The company pays for one approved certification per "
+        f"year (for example AWS, Azure or PMP) up to {inr(30000)}.",
+    )
+    d.flow.append(PageBreak())
+    d.section(
+        "Appraisal Cycle",
+        "The appraisal year runs from <b>1 April to 31 March</b>. Goals are set in April, a mid-year check-in is "
+        "held in October, and final ratings on a 1 to 5 scale are given in April. Increments are paid from the "
+        "July salary. Promotions are announced twice a year, in July and January.",
+    )
+    d.section(
+        "Referral Bonus",
+        f"An employee who refers a candidate who joins receives <b>{inr(25000)}</b>, paid after the new hire "
+        f"completes 6 months. For niche roles (architect and above) the bonus is {inr(50000)}. HR employees and the "
+        "hiring manager are not eligible for a referral bonus for their own openings.",
+    )
+    d.flow.append(PageBreak())
+    d.section(
+        "Canteen and Transport",
+        f"Each office has a subsidised canteen: breakfast {inr(30)}, lunch {inr(60)} and evening snacks {inr(20)}. "
+        "Tea and coffee are free. Company shuttle buses run on 12 routes in Pune, 8 in Bengaluru and 5 in Noida "
+        f"for {inr(1500)} per month. Employees leaving after 9:00 pm get a free cab drop; women employees get an "
+        "escort after 8:00 pm.",
+    )
+    d.section(
+        "HR Contacts",
+        bullets=["HR helpdesk (all offices): hr@navyug.example, 020-6740-2000, 9:30 am to 6:30 pm",
+                 "Payroll queries: payroll@navyug.example, extension 2010",
+                 "Pune HR: Kavita Shinde, kavita.shinde@navyug.example, 020-6740-2001",
+                 "Bengaluru HR: Arjun Hegde, arjun.hegde@navyug.example, 080-4920-3001",
+                 "Noida HR: Ritu Malhotra, ritu.malhotra@navyug.example, 0120-461-4001",
+                 "Internal Complaints Committee (POSH): icc@navyug.example"],
+    )
+    d.flow.append(PageBreak())
+    d.faq([
+        ("When was Navyug founded?", "In 2009."),
+        ("Where is the head office?", "Navyug Towers, Hinjewadi Phase 2, Pune 411057."),
+        ("How many employees does Navyug have?", "2,450 across Pune, Bengaluru and Noida."),
+        ("How many employees work in the Bengaluru office?", "760."),
+        ("How many employees work in Noida?", "410."),
+        ("Who founded the company?", "Anil Deshmukh and Priya Raghavan."),
+        ("What are the business units?", "Banking and Financial Services, Retail and Consumer, Healthcare, Cloud and Data."),
+        ("What are the working hours at Navyug?", "9:30 am to 6:30 pm, Monday to Friday."),
+        ("What are the core hours?", "11:00 am to 4:00 pm."),
+        ("Do we work on Saturdays?", "No. Saturdays and Sundays are off, except for shift rosters."),
+        ("Is there a night shift allowance?", f"Yes, {inr(300)} per night shift."),
+        ("How many holidays are there in 2026?", "12 public holidays in each office."),
+        ("Is Holi a holiday in Bengaluru?", "No. Holi is a holiday in Pune and Noida only."),
+        ("Is Diwali a holiday?", "Yes, 8 November 2026 in all offices."),
+        ("Is Kannada Rajyotsava a holiday?", "Only in the Bengaluru office (1 November)."),
+        ("What is the dress code?", "Business casual Monday to Thursday; casual on Fridays."),
+        ("Can I wear jeans to office?", "Yes, on Fridays. Shorts and slippers are never allowed."),
+        ("When will I get my laptop?", "On the day of joining."),
+        ("How often are laptops replaced?", "Every 4 years."),
+        ("What if I lose my laptop?", f"Report within 24 hours; the first negligent loss is recovered at {inr(15000)}."),
+        ("Can I install personal software?", "Only with IT approval."),
+        ("What is the hotel limit in metro cities?", f"{inr(5000)} per night for Band A-B and {inr(7500)} for Band C-D."),
+        ("What is the meal allowance on travel?", f"{inr(1000)} per day for Band A-B and {inr(1500)} for Band C-D."),
+        ("Can I travel by flight?", "Yes, economy class for journeys over 500 km."),
+        ("When should I submit travel claims?", "Within 30 days of travel, with bills."),
+        ("Is the mobile bill reimbursed?", f"Yes, {inr(500)} per month (Band A-B) or {inr(1000)} (Band C-D)."),
+        ("How long is the induction programme?", "4 weeks (Navyug Launchpad)."),
+        ("How many learning hours are required?", "At least 40 hours per year."),
+        ("Does the company pay for certifications?", f"Yes, one approved certification per year up to {inr(30000)}."),
+        ("When is the appraisal?", "Final ratings are given in April; increments are paid from the July salary."),
+        ("When are promotions announced?", "Twice a year, in July and January."),
+        ("What is the referral bonus?", f"{inr(25000)} ({inr(50000)} for architect and above), paid after 6 months."),
+        ("How much does lunch cost in the canteen?", f"{inr(60)}. Tea and coffee are free."),
+        ("Is there a company bus?", f"Yes, shuttle buses at {inr(1500)} per month."),
+        ("Do I get a cab if I work late?", "Yes, a free cab drop after 9:00 pm."),
+        ("What is the HR helpdesk email?", "hr@navyug.example (020-6740-2000)."),
+        ("Who is the HR contact in Bengaluru?", "Arjun Hegde, arjun.hegde@navyug.example."),
+        ("Who is the HR contact in Noida?", "Ritu Malhotra, ritu.malhotra@navyug.example."),
+        ("Where do I send payroll questions?", "payroll@navyug.example, extension 2010."),
+        ("What is the IT helpdesk number?", "Extension 4000, open 8:00 am to 10:00 pm."),
+    ])
+    d.save(ROOT / "org2" / "Navyug_Company_Profile_and_FAQ.pdf")
+
+
 if __name__ == "__main__":
-    for build in (nit_scholarship, nit_fees, nit_academics, navyug_leave, navyug_handbook, navyug_benefits):
+    for build in (nit_scholarship, nit_fees, nit_academics, navyug_leave, navyug_handbook, navyug_benefits,
+                  nit_factbook, navyug_factbook):
         build()
