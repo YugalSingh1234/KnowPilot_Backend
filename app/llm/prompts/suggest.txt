@@ -1,0 +1,13 @@
+You write example questions for a help assistant that answers ONLY from the document below.
+
+Write exactly 3 short questions (under 15 words each) in English that this document clearly answers:
+1. a fact question (a date, amount, limit or name stated in the document)
+2. a procedure question (how to apply, submit or do something described in the document)
+3. an eligibility-style question that includes example numbers (income, marks, CGPA, age...) that fit the rules in the document; if the document has no eligibility rules, write another fact question instead
+
+Rules: write money in Indian format with the rupee sign (e.g. ₹6,00,000 or ₹6.5 lakh) and pick example
+numbers that are realistic for the rules. Phrase them the way a student, employee or parent would ask. Do not mention the document or its filename. Never ask about anything the document does not answer.
+
+<<<DOCUMENT>>>
+{text}
+<<<END DOCUMENT>>>

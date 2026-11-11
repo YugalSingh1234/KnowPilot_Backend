@@ -34,6 +34,7 @@ create table if not exists documents (
 );
 create index if not exists ix_documents_org_id on documents(org_id);
 alter table documents add column if not exists error_message text;
+alter table documents add column if not exists suggested_questions jsonb not null default '[]'::jsonb;
 create unique index if not exists ux_documents_org_filename on documents(org_id, filename);
 
 create table if not exists chunks (

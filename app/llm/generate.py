@@ -1,4 +1,5 @@
 """Gemini calls with structured output. The LLM extracts rules and writes answers; Python decides."""
+import logging
 from pathlib import Path
 from typing import Literal
 
@@ -11,6 +12,7 @@ from app.llm.client import get_client
 from app.llm.embeddings import call_with_retry
 from app.system1.decisions.schemas import Condition, Conversions, DecisionSpec, Source
 
+log = logging.getLogger("knowpilot.generate")
 PROMPTS = Path(__file__).resolve().parent / "prompts"
 LANGUAGE_NAMES = {"en": "English", "hi": "Hindi (Devanagari script)", "hinglish": "Hinglish (Hindi written in Latin script)"}
 
@@ -41,6 +43,10 @@ class LLMSpec(BaseModel):
     user_facts: list[LLMFact]
     cgpa_to_percentage: float | None = None
     cgpa_to_percentage_source: LLMSource | None = None
+
+
+class LLMSuggestions(BaseModel):
+    questions: list[str]
 
 
 class LLMAnswer(BaseModel):
@@ -138,3 +144,17 @@ def generate_answer(question: str, chunks: list[dict], language: str, question_t
             seen.add((s.filename, s.page))
             used.append({"filename": s.filename, "page": s.page})
     return {"covered": bool(out.covered), "answer_text": out.answer_text.strip(), "used_sources": used}
+
+
+# ---------- c) suggested questions for a document ----------
+SUGGEST_INPUT_CHARS = 30_000
+
+
+def suggest_questions(text: str) -> list[str]:
+    """3 short English questions this document clearly answers. Never raises: failure -> []."""
+    try:
+        out: LLMSuggestions = _generate(_prompt("suggest.txt", text=text[:SUGGEST_INPUT_CHARS]), LLMSuggestions)
+        return [q.strip() for q in out.questions if q.strip()][:3]
+    except Exception as e:  # suggestions are optional; the document is still ready
+        log.warning("Suggested questions failed: %s", type(e).__name__)
+        return []

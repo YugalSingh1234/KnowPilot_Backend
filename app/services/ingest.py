@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.errors import AppError
 from app.llm.embeddings import embed_documents
+from app.llm.generate import suggest_questions
 from app.models import Chunk, Document, Organization
 from app.services import storage
 
@@ -176,6 +177,9 @@ def ingest(db: Session, org_id, filename: str, data: bytes) -> Document:
         raise AppError(
             "document_processing_failed", "We couldn't process this PDF. Please try again.", 500
         ) from e
+    # After the document is ready, so a Gemini failure never fails the upload (it stores []).
+    doc.suggested_questions = suggest_questions("\n\n".join(pages))
+    db.commit()
     return doc
 
 

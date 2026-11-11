@@ -2,12 +2,13 @@
 import logging
 import time
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db import db_retry
 from app.errors import AppError
 from app.llm import generate
-from app.models import QuestionLog
+from app.models import Organization, QuestionLog
 from app.services import retrieval
 from app.system1 import answerability, classifier, language as lang
 from app.system1.decisions import engine
@@ -15,9 +16,9 @@ from app.system1.decisions import engine
 log = logging.getLogger("knowpilot.ask")
 
 NO_ANSWER = {
-    "en": "I couldn't find an answer to this in the uploaded documents. Please contact the office for help.",
-    "hi": "मुझे अपलोड किए गए दस्तावेज़ों में इसका उत्तर नहीं मिला। कृपया सहायता के लिए कार्यालय से संपर्क करें।",
-    "hinglish": "Mujhe uploaded documents mein iska jawab nahi mila. Kripya madad ke liye office se sampark karein.",
+    "en": "This isn't covered in {org}'s documents. Please contact the organization directly.",
+    "hi": "यह जानकारी {org} के दस्तावेज़ों में नहीं है। कृपया सीधे संस्था से संपर्क करें।",
+    "hinglish": "Yeh jaankari {org} ke documents mein nahi hai. Kripya seedhe organization se sampark karein.",
 }
 BUSY = "The AI service is busy; here are the most relevant passages:"
 SNIPPET = 220
@@ -27,10 +28,21 @@ class Trace:
     def __init__(self):
         self.steps, self._t = [], time.perf_counter()
 
-    def add(self, step: str, kind: str):
+    def add(self, step: str, kind: str, summary: str | None = None):
         now = time.perf_counter()
-        self.steps.append({"step": step, "kind": kind, "ms": round((now - self._t) * 1000, 1)})
+        item = {"step": step, "kind": kind, "ms": round((now - self._t) * 1000, 1)}
+        if summary:
+            item["summary"] = summary
+        self.steps.append(item)
         self._t = now
+
+
+def retrieval_summary(chunks: list[dict]) -> str:
+    """What retrieval found, for the Processing steps panel (never the question text)."""
+    if not chunks:
+        return "No matching passages"
+    top = max(chunks, key=lambda c: c["vector_score"])
+    return f"{len(chunks)} passages; top match {top['vector_score']:.2f} in {top['filename']} — Page {top['page_number']}"
 
 
 def _reference(chunks: list[dict], filename: str, page: int) -> dict:
@@ -58,13 +70,15 @@ def ask(db: Session, org_id, question: str) -> dict:
     trace.add("classifier", "system1")
 
     chunks = db_retry(db, lambda: retrieval.retrieve(db, org_id, question))
-    trace.add("retrieval", "retrieval")
+    trace.add("retrieval", "retrieval", retrieval_summary(chunks))
     gate = answerability.is_answerable(chunks)
     trace.add("answerability_gate", "system1")
 
+    org_name = db_retry(db, lambda: db.scalar(select(Organization.name).where(Organization.id == org_id)))
+    no_answer = NO_ANSWER[language].format(org=org_name)
     decision, references = None, []
     if qtype == "out_of_scope" or not gate["answerable"]:
-        status, answer = "no_answer", NO_ANSWER[language]
+        status, answer = "no_answer", no_answer
     else:
         if qtype == "eligibility":
             try:
@@ -84,7 +98,7 @@ def ask(db: Session, org_id, question: str) -> dict:
                 status, answer = "answered", out["answer_text"]
                 references = [_reference(chunks, s["filename"], s["page"]) for s in out["used_sources"]]
             else:
-                status, answer = "no_answer", NO_ANSWER[language]
+                status, answer = "no_answer", no_answer
         except AppError:
             trace.add("generate_answer_failed", "fallback")
             pages = list(dict.fromkeys((c["filename"], c["page_number"]) for c in chunks))[:3]

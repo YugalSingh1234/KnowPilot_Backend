@@ -97,9 +97,10 @@ as GET /api/assistant.
 
 ### GET /api/assistant/{token}/info  → 200  (public, no login, any origin)
 ```json
-{"org_name": "Sunrise College", "suggested_questions": []}
+{"org_name": "Sunrise College", "suggested_questions": ["What is the hostel fee per year?", "How do I apply for re-evaluation?"]}
 ```
-Never returns emails or ids. `suggested_questions` is empty for now.
+Never returns emails or ids. `suggested_questions`: up to 6 English questions (3 generated per document when it
+becomes ready, mixed across documents). Can be `[]` if generation failed or no documents are ready.
 
 Errors:
 - 404 `invalid_token`: "This assistant link is not active." (unknown, revoked or malformed token)
@@ -134,7 +135,7 @@ Response:
     "missing_facts": [],
     "timings": [{"decision": "boolean", "start_ms": 0.4, "end_ms": 1.2, "error": null}]
   },
-  "trace": [{"step": "language", "kind": "system1", "ms": 0.1}, {"step": "generate_answer", "kind": "llm", "ms": 2140.5}]
+  "trace": [{"step": "language", "kind": "system1", "ms": 0.1}, {"step": "retrieval", "kind": "retrieval", "ms": 410.2, "summary": "6 passages; top match 0.69 in NIT_Scholarship_Policy_2025-26.pdf — Page 1"}, {"step": "generate_answer", "kind": "llm", "ms": 2140.5}]
 }
 ```
 
@@ -148,6 +149,8 @@ Response:
 | `booleans[].result` | `TRUE`, `FALSE`, `UNKNOWN` |
 | `decision.score` | 0-100: weighted share of conditions met (UNKNOWN counts half) |
 | `trace[].kind` | `system1`, `retrieval`, `llm`, `fallback` |
+| `trace[].summary` | optional; present on the `retrieval` step |
+| `no_answer` text | "This isn't covered in {org_name}'s documents. Please contact the organization directly." (Hindi / Hinglish equivalent for those languages) |
 
 The decision is computed in Python; the answer text never contradicts it.
 

@@ -1,4 +1,5 @@
 import html
+from itertools import zip_longest
 
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
@@ -6,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db import get_db
-from app.models import AssistantToken, Organization
+from app.models import AssistantToken, Document, Organization
 from app.security import get_current_org
 from app.services import ratelimit, tokens
 
@@ -39,4 +40,19 @@ def public_info(token: str, request: Request, db: Session = Depends(get_db)):
     org_id = tokens.resolve_assistant_token(token, db)
     ratelimit.check_token(token)
     name = db.scalar(select(Organization.name).where(Organization.id == org_id))
-    return {"org_name": name, "suggested_questions": []}
+    per_doc = db.scalars(
+        select(Document.suggested_questions)
+        .where(Document.org_id == org_id, Document.status == "ready")
+        .order_by(Document.created_at)
+    ).all()
+    return {"org_name": name, "suggested_questions": pick_suggestions(per_doc)}
+
+
+def pick_suggestions(per_doc: list[list[str]], limit: int = 6) -> list[str]:
+    """Round-robin across documents so one PDF can't fill every slot; no duplicates."""
+    out: list[str] = []
+    for round_ in zip_longest(*(q or [] for q in per_doc)):
+        for q in round_:
+            if q and q not in out and len(out) < limit:
+                out.append(q)
+    return out

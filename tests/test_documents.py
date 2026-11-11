@@ -33,6 +33,7 @@ def fakes(monkeypatch):
     monkeypatch.setattr(storage, "upload", lambda path, data: files.__setitem__(path, data))
     monkeypatch.setattr(storage, "delete", lambda path: files.pop(path, None))
     monkeypatch.setattr(ingest, "embed_documents", lambda texts: [[1.0] + [0.0] * 767 for _ in texts])
+    monkeypatch.setattr(ingest, "suggest_questions", lambda text: ["Q1?", "Q2?", "Q3?"])
     return files
 
 
