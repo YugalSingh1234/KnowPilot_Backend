@@ -6,10 +6,10 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from app.config import get_settings
+from app.config import APP_VERSION, get_settings
 from app.db import get_db
 from app.errors import register_error_handlers
-from app.routers import ask, assistant, auth, documents, usage
+from app.routers import ask, assistant, auth, documents, status, usage
 
 # Public (any origin): /api/ask and /api/assistant/{token}/info. Admin routes stay on FRONTEND_ORIGIN.
 PUBLIC_PATH = re.compile(r"^/api/ask(/.*)?$|^/api/assistant/[^/]+/info$")
@@ -31,11 +31,12 @@ class SplitCORS:
         return await self.private(scope, receive, send)
 
 
-app = FastAPI(title="KnowPilot")
+app = FastAPI(title="KnowPilot", version=APP_VERSION)
 app.add_middleware(SplitCORS)
 register_error_handlers(app)
 for module in (auth, documents, assistant, ask, usage):
     app.include_router(module.router)
+app.include_router(status.router)
 
 
 @app.get("/api/health")
